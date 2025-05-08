@@ -1,8 +1,5 @@
 package com.banula.ocn;
 
-import com.aayushatharva.brotli4j.Brotli4jLoader;
-import com.aayushatharva.brotli4j.decoder.Decoder;
-import com.aayushatharva.brotli4j.encoder.Encoder;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,7 +12,11 @@ import com.banula.ocn.model.ValuesToSign;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Hash;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class Notary {
 
@@ -29,7 +30,6 @@ public class Notary {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     static {
-        Brotli4jLoader.ensureAvailability();
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.findAndRegisterModules();
@@ -37,12 +37,23 @@ public class Notary {
     }
 
     public static byte[] compress(byte[] input) throws Exception {
-        Encoder.Parameters opts = new Encoder.Parameters().setQuality(4);
-        return Encoder.compress(input, opts);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream)) {
+            gzipOutputStream.write(input);
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 
     public static byte[] decompress(byte[] input) throws Exception {
-        return Decoder.decompress(input).getDecompressedData();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(input))) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = gzipInputStream.read(buffer)) > 0) {
+                byteArrayOutputStream.write(buffer, 0, length);
+            }
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 
     public static Notary deserialize(String ocnSignature) throws Exception {

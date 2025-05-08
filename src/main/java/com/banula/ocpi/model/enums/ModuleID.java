@@ -30,7 +30,9 @@ public enum ModuleID {
     SESSIONS("sessions"),
     TARIFFS("tariffs"),
     TOKENS("tokens"),
-    CUSTOM_FLEXIBILITY("flexibility");
+    CUSTOM_FLEXIBILITY("flexibility"),
+    CUSTOM_SMART_LOCATIONS("smartlocations");
+
     private final String value;
 
     ModuleID(String value) {

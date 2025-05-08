@@ -29,7 +29,8 @@ public enum OcnEndpoints {
 
     // CUSTOM MODULES
     // SCSP
-    SCSP_CALCULATE_FLEXIBILITY("/ocpi/custom/receiver/flexibility");
+    SCSP_CALCULATE_FLEXIBILITY("/ocpi/custom/receiver/flexibility"),
+    CUSTOM_SMART_LOCATIONS("ocpi/custom/smartlocations");
 
     private String url;
 
