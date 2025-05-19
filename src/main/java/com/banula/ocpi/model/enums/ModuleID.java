@@ -7,13 +7,13 @@ import com.banula.ocpi.util.EnumUtil;
 /**
  * The Module identifiers for each endpoint are described in the beginning of each Module chapter.
  * The following table contains the list of modules in this version of OCPI.
- * Most modules (except Credentials & Registration) are optional, but there might be dependencies between modules.
+ * Most modules (except Credentials and Registration) are optional, but there might be dependencies between modules.
  * If there are dependencies between modules, it will be mentioned in the affected module description.
  */
 /**
  * The Module identifiers for each endpoint are described in the beginning of each Module chapter.
  * The following table contains the list of modules in this version of OCPI.
- * Most modules (except Credentials & Registration) are optional, but there might be dependencies between modules.
+ * Most modules (except Credentials and Registration) are optional, but there might be dependencies between modules.
  * If there are dependencies between modules, it will be mentioned in the affected module description.
  */
 public enum ModuleID {
