@@ -53,7 +53,6 @@ public class OcnClient {
     }
 
     public void shakeHands() {
-        //log.info("OCPI-lib version: {}", InfoUtils.getOcpiLibVersion());
         log.info("Party Configuration: {} {} {} | url: {}", configuration.getOcpiRoles(),
                 configuration.getFromCountryCode(), configuration.getFromPartyId(), configuration.getPartyBackendUrl());
         log.info("Initiating communication with the ocn-node: {}", configuration.getNodeUrl());
@@ -159,7 +158,7 @@ public class OcnClient {
 
     // to keep compliance with badenova-cpo
     public <T, N> OcpiResponse<T> executeOcpiOperation(OcnEndpoints endpoint, N body, String toPartyId,
-            String toCountryCode, Class<T> refType) throws Exception {
+                                                       String toCountryCode, Class<T> refType) throws Exception {
         String currentCountryCode = configuration.getToCountryCode();
         String currentPartyId = configuration.getToPartyId();
 
@@ -178,7 +177,7 @@ public class OcnClient {
     }
 
     public <T, N> OcpiResponse<T> executeOcpiOperation(OcnEndpoints endpoint, N body, String toPartyId,
-            String toCountryCode, Class<T> refType, HttpMethod httpMethod, List<String> pathVariables)
+                                                       String toCountryCode, Class<T> refType, HttpMethod httpMethod, List<String> pathVariables)
             throws Exception {
         String currentCountryCode = configuration.getToCountryCode();
         String currentPartyId = configuration.getToPartyId();
@@ -198,9 +197,9 @@ public class OcnClient {
     }
 
     public <T, N> OcpiResponse<T> executeOcpiOperation(OcnEndpoints endpoint, N body, String toPartyId,
-            String toCountryCode,
-            Class<T> refType, HttpMethod httpMethod, List<String> pathVariables,
-            HashMap<String, String> requestParameters) throws Exception {
+                                                       String toCountryCode,
+                                                       Class<T> refType, HttpMethod httpMethod, List<String> pathVariables,
+                                                       HashMap<String, String> requestParameters) throws Exception {
         String currentCountryCode = configuration.getToCountryCode();
         String currentPartyId = configuration.getToPartyId();
 
@@ -219,8 +218,8 @@ public class OcnClient {
     }
 
     private <T, N> T _call(OcnEndpoints endpoint, N body, HashMap<String, String> params, HttpHeaders headers,
-            ParameterizedTypeReference<T> responseTypeRef, HttpMethod httpMethod, List<String> pathVariables,
-            HashMap<String, String> requestParameters) throws Exception {
+                           ParameterizedTypeReference<T> responseTypeRef, HttpMethod httpMethod, List<String> pathVariables,
+                           HashMap<String, String> requestParameters) throws Exception {
         addSignatureIfSupported(headers, body, params);
         String requestBody = objectMapper.writeValueAsString(body);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
@@ -237,7 +236,7 @@ public class OcnClient {
     }
 
     public <T, N> OcpiResponse<T> executeOcpiOperation(String url, N body, String toPartyId, String toCountryCode,
-            Class<T> refType, HttpMethod httpMethod, List<String> pathVariables) throws Exception {
+                                                       Class<T> refType, HttpMethod httpMethod, List<String> pathVariables) throws Exception {
         String currentCountryCode = configuration.getToCountryCode();
         String currentPartyId = configuration.getToPartyId();
 
@@ -255,11 +254,33 @@ public class OcnClient {
         return response;
     }
 
+    // Added this method to support cases that use a custom URL with Class<T> and
+    // request parameters
+    public <T, N> OcpiResponse<T> executeOcpiOperation(String url, N body, String toPartyId, String toCountryCode,
+                                                       Class<T> refType, HttpMethod httpMethod, List<String> pathVariables,
+                                                       HashMap<String, String> requestParameters) throws Exception {
+        String currentCountryCode = configuration.getToCountryCode();
+        String currentPartyId = configuration.getToPartyId();
+
+        configuration.setToCountryCode(toCountryCode);
+        configuration.setToPartyId(toPartyId);
+
+        ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef = GenericTypeRefUtil.getWrapperTypeRef(refType);
+        HttpHeaders headers = this.createHeaders();
+        OcpiResponse<T> response = this._call(url, body, new HashMap<>(), headers, responseTypeRef, httpMethod,
+                pathVariables, requestParameters);
+
+        configuration.setToCountryCode(currentCountryCode);
+        configuration.setToPartyId(currentPartyId);
+
+        return response;
+    }
+
     // created due to CommandResult that must be sent for a complete url informed by
     // OCN (StartSession.responseUrl) instead of a predetermined endpoint
     private <T, N> T _call(String url, N body, HashMap<String, String> params, HttpHeaders headers,
-            ParameterizedTypeReference<T> responseTypeRef, HttpMethod httpMethod, List<String> pathVariables,
-            HashMap<String, String> requestParameters) throws Exception {
+                           ParameterizedTypeReference<T> responseTypeRef, HttpMethod httpMethod, List<String> pathVariables,
+                           HashMap<String, String> requestParameters) throws Exception {
         addSignatureIfSupported(headers, body, params);
         String requestBody = objectMapper.writeValueAsString(body);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
@@ -275,7 +296,7 @@ public class OcnClient {
     }
 
     private void addPathAndQueryParams(UriComponentsBuilder uriBuilder, List<String> pathVariables,
-            HashMap<String, String> requestParameters) {
+                                       HashMap<String, String> requestParameters) {
         // Add path variables in request
         for (String pathVariable : pathVariables) {
             uriBuilder.pathSegment(pathVariable);
@@ -336,6 +357,48 @@ public class OcnClient {
         configuration.setToPartyId(currentPartyId);
 
         return response;
+    }
+
+    // Added this method to support cases that use a custom URL instead of
+    // OcnEndpoints
+    public <T, N> OcpiResponse<T> executeOcpiOperation(
+            String url,
+            N body,
+            String toPartyId,
+            String toCountryCode,
+            ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef,
+            HttpMethod httpMethod,
+            List<String> pathVariables,
+            HashMap<String, String> requestParameters) throws Exception {
+
+        String currentCountryCode = configuration.getToCountryCode();
+        String currentPartyId = configuration.getToPartyId();
+
+        configuration.setToCountryCode(toCountryCode);
+        configuration.setToPartyId(toPartyId);
+
+        HttpHeaders headers = this.createHeaders();
+        OcpiResponse<T> response = this._call(url, body, new HashMap<>(), headers, responseTypeRef, httpMethod,
+                pathVariables, requestParameters);
+
+        configuration.setToCountryCode(currentCountryCode);
+        configuration.setToPartyId(currentPartyId);
+
+        return response;
+    }
+
+    // Added this method to support cases that use a custom URL with no request
+    // parameters
+    public <T, N> OcpiResponse<T> executeOcpiOperation(
+            String url,
+            N body,
+            String toPartyId,
+            String toCountryCode,
+            ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef,
+            HttpMethod httpMethod,
+            List<String> pathVariables) throws Exception {
+        return this.executeOcpiOperation(url, body, toPartyId, toCountryCode, responseTypeRef, httpMethod,
+                pathVariables, null);
     }
 
     private HttpHeaders createHeaders() {
@@ -411,7 +474,7 @@ public class OcnClient {
     }
 
     public String registerPartyCredentials(String registrationToken, String backendUrl, List<Role> roles,
-            HttpMethod httpMethod) throws Exception {
+                                           HttpMethod httpMethod) throws Exception {
 
         List<CredentialsRole> credentialsRoles = new ArrayList<>();
         for (Role role : roles) {
