@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class ValidateLocation {
 
 
-    @Around("@annotation(com.olisystems.ocpi.annotation.ValidateLocation)")
+    @Around("@annotation(com.banula.ocpi.annotation.ValidateLocation)")
     public Object processValidateLocation(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         LocationDTO locationDTO = (LocationDTO) args[0];

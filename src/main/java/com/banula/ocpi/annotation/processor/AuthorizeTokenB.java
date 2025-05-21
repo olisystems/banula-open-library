@@ -23,7 +23,7 @@ public class AuthorizeTokenB {
     private final OcnClient ocnClient;
 
     //TODO: We should revisit the token B handling later to understand how the OCN node implemented the ocpis credentials module.
-    @Around("@annotation(com.olisystems.ocpi.annotation.AuthorizeTokenB)")
+    @Around("@annotation(com.banula.ocpi.annotation.AuthorizeTokenB)")
     public Object processAuthorizationHeader(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String tokenB = request.getHeader("Authorization");

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class LogRequest {
 
-    @Around("@annotation(com.olisystems.ocpi.annotation.LogRequest)")
+    @Around("@annotation(com.banula.ocpi.annotation.LogRequest)")
     public Object processValidateLocation(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("Controller called: {}", joinPoint.getSignature());
         Object[] args = joinPoint.getArgs();

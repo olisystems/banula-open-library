@@ -28,7 +28,7 @@ public class AuthorizeOcnSignatureAndHeaders {
 
     private final OcnClient ocnClient;
 
-    @Around("@annotation(com.olisystems.ocpi.annotation.AuthorizeOcnSignatureAndHeaders)")
+    @Around("@annotation(com.banula.ocpi.annotation.AuthorizeOcnSignatureAndHeaders)")
     public Object processAuthorizationHeader(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String tokenB = request.getHeader("Authorization");

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class ValidateEVSE {
 
-    @Around("@annotation(com.olisystems.ocpi.annotation.ValidateEVSE)")
+    @Around("@annotation(com.banula.ocpi.annotation.ValidateEVSE)")
     public Object processValidateEvse(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         EVSE evse = (EVSE) args[0];

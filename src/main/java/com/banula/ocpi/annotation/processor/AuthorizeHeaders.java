@@ -22,7 +22,7 @@ public class AuthorizeHeaders {
 
     private final OcnClient ocnClient;
 
-    @Around("@annotation(com.olisystems.ocpi.annotation.AuthorizeHeaders)")
+    @Around("@annotation(com.banula.ocpi.annotation.AuthorizeHeaders)")
     public Object processAuthorizationHeader(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String tokenB = request.getHeader("Authorization");

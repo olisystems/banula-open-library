@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class ValidateConnector {
 
-    @Around("@annotation(com.olisystems.ocpi.annotation.ValidateConnector)")
+    @Around("@annotation(com.banula.ocpi.annotation.ValidateConnector)")
     public Object processValidateEvse(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         Connector connector = (Connector) args[0];
