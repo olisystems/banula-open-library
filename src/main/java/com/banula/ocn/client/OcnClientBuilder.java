@@ -71,6 +71,11 @@ public class OcnClientBuilder {
         return this;
     }
 
+    public OcnClientBuilder setIntegrationTestParameter(String integrationTest) {
+        this.configuration.setIntegrationTestParameter(integrationTest);
+        return this;
+    }
+
     public OcnClient build() {
         return new OcnClient(this.configuration, ocnCredentialHandler);
     }

@@ -22,4 +22,5 @@ public class OcnClientConfiguration {
     private List<Role> ocpiRoles;
     private String partyBackendUrl;
     private boolean updatingParty;
+    private String integrationTestParameter;
 }

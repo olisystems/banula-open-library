@@ -53,7 +53,6 @@ public class OcnClient {
     }
 
     public void shakeHands() {
-        //log.info("OCPI-lib version: {}", InfoUtils.getOcpiLibVersion());
         log.info("Party Configuration: {} {} {} | url: {}", configuration.getOcpiRoles(),
                 configuration.getFromCountryCode(), configuration.getFromPartyId(), configuration.getPartyBackendUrl());
         log.info("Initiating communication with the ocn-node: {}", configuration.getNodeUrl());
@@ -255,6 +254,28 @@ public class OcnClient {
         return response;
     }
 
+    // Added this method to support cases that use a custom URL with Class<T> and
+    // request parameters
+    public <T, N> OcpiResponse<T> executeOcpiOperation(String url, N body, String toPartyId, String toCountryCode,
+            Class<T> refType, HttpMethod httpMethod, List<String> pathVariables,
+            HashMap<String, String> requestParameters) throws Exception {
+        String currentCountryCode = configuration.getToCountryCode();
+        String currentPartyId = configuration.getToPartyId();
+
+        configuration.setToCountryCode(toCountryCode);
+        configuration.setToPartyId(toPartyId);
+
+        ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef = GenericTypeRefUtil.getWrapperTypeRef(refType);
+        HttpHeaders headers = this.createHeaders();
+        OcpiResponse<T> response = this._call(url, body, new HashMap<>(), headers, responseTypeRef, httpMethod,
+                pathVariables, requestParameters);
+
+        configuration.setToCountryCode(currentCountryCode);
+        configuration.setToPartyId(currentPartyId);
+
+        return response;
+    }
+
     // created due to CommandResult that must be sent for a complete url informed by
     // OCN (StartSession.responseUrl) instead of a predetermined endpoint
     private <T, N> T _call(String url, N body, HashMap<String, String> params, HttpHeaders headers,
@@ -336,6 +357,48 @@ public class OcnClient {
         configuration.setToPartyId(currentPartyId);
 
         return response;
+    }
+
+    // Added this method to support cases that use a custom URL instead of
+    // OcnEndpoints
+    public <T, N> OcpiResponse<T> executeOcpiOperation(
+            String url,
+            N body,
+            String toPartyId,
+            String toCountryCode,
+            ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef,
+            HttpMethod httpMethod,
+            List<String> pathVariables,
+            HashMap<String, String> requestParameters) throws Exception {
+
+        String currentCountryCode = configuration.getToCountryCode();
+        String currentPartyId = configuration.getToPartyId();
+
+        configuration.setToCountryCode(toCountryCode);
+        configuration.setToPartyId(toPartyId);
+
+        HttpHeaders headers = this.createHeaders();
+        OcpiResponse<T> response = this._call(url, body, new HashMap<>(), headers, responseTypeRef, httpMethod,
+                pathVariables, requestParameters);
+
+        configuration.setToCountryCode(currentCountryCode);
+        configuration.setToPartyId(currentPartyId);
+
+        return response;
+    }
+
+    // Added this method to support cases that use a custom URL with no request
+    // parameters
+    public <T, N> OcpiResponse<T> executeOcpiOperation(
+            String url,
+            N body,
+            String toPartyId,
+            String toCountryCode,
+            ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef,
+            HttpMethod httpMethod,
+            List<String> pathVariables) throws Exception {
+        return this.executeOcpiOperation(url, body, toPartyId, toCountryCode, responseTypeRef, httpMethod,
+                pathVariables, null);
     }
 
     private HttpHeaders createHeaders() {
