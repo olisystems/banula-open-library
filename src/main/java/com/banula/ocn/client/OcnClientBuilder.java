@@ -9,6 +9,7 @@ public class OcnClientBuilder {
     OcnClientConfiguration configuration;
     OcnClient ocnClient;
     OcnCredentialHandler ocnCredentialHandler;
+    OcnVersionDetailsHandler ocnVersionDetailsHandler;
 
     public OcnClientBuilder() {
         this.configuration = new OcnClientConfiguration();
@@ -71,12 +72,17 @@ public class OcnClientBuilder {
         return this;
     }
 
+    public OcnClientBuilder setOcnVersionDetailsHandler(OcnVersionDetailsHandler ocnVersionDetailsHandler) {
+        this.ocnVersionDetailsHandler = ocnVersionDetailsHandler;
+        return this;
+    }
+
     public OcnClientBuilder setIntegrationTestParameter(String integrationTest) {
         this.configuration.setIntegrationTestParameter(integrationTest);
         return this;
     }
 
     public OcnClient build() {
-        return new OcnClient(this.configuration, ocnCredentialHandler);
+        return new OcnClient(this.configuration, ocnCredentialHandler, ocnVersionDetailsHandler);
     }
 }

@@ -1,5 +1,23 @@
 package com.banula.ocn.client;
 
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
+
+import com.banula.ocn.model.OcnClientConfiguration;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,13 +31,12 @@ import com.banula.ocpi.model.dto.CredentialsDTO;
 import com.banula.ocpi.model.enums.Role;
 import com.banula.ocpi.model.vo.BusinessDetails;
 import com.banula.ocpi.model.vo.CredentialsRole;
-import lombok.extern.slf4j.Slf4j;
+import com.banula.ocpi.model.vo.Endpoint;
+
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
@@ -30,6 +47,7 @@ public class OcnClient {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private OcnCredentialHandler ocnCredentialHandler;
     private RestTemplate restTemplate;
+    private OcnVersionDetailsHandler ocnVersionDetailsHandler;
 
     static OcnClientConfiguration configuration;
 
@@ -42,9 +60,11 @@ public class OcnClient {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
-    public OcnClient(OcnClientConfiguration initialConfiguration, OcnCredentialHandler ocnCredentialHandler) {
+    public OcnClient(OcnClientConfiguration initialConfiguration, OcnCredentialHandler ocnCredentialHandler,
+            OcnVersionDetailsHandler ocnVersionDetailsHandler) {
         this.restTemplate = new RestTemplate();
         this.ocnCredentialHandler = ocnCredentialHandler;
+        this.ocnVersionDetailsHandler = ocnVersionDetailsHandler;
         configuration = initialConfiguration;
         HttpClient httpClient = HttpClientBuilder.create().build();
         // necessary to allow PATCH requests
@@ -77,6 +97,14 @@ public class OcnClient {
                 }
             }
             verifyAndSetGeneratedTokenC(generatedTokenC);
+            OcnVersionDetails endpointResponse = this.getVersionDetails();
+
+            log.info("Version: {}", endpointResponse.getVersion());
+            for (Endpoint endpoint : endpointResponse.getEndpoints()) {
+                log.info("Endpoint: {}", endpoint);
+            }
+            ocnVersionDetailsHandler.saveVersionDetails(endpointResponse);
+
         } catch (Exception ex) {
             log.error(String.format("OCN party registration error: %s", ex.getLocalizedMessage()));
             for (StackTraceElement ste : ex.getStackTrace()) {
@@ -401,9 +429,43 @@ public class OcnClient {
                 pathVariables, null);
     }
 
+    /**
+     * Retrieves a list of available OCPI endpoints from the OCN node
+     * 
+     * @return List of Endpoint objects representing available OCPI modules and
+     *         their URLs
+     * @throws Exception if communication fails
+     */
+    public OcnVersionDetails getVersionDetails() throws Exception {
+        try {
+            // Create the URL for the endpoints resource
+            String url = String.format("%s/ocpi/2.2.1", configuration.getNodeUrl());
+
+            // Define the response type (a wrapper containing a list of endpoints)
+            ParameterizedTypeReference<OcpiResponse<OcnVersionDetails>> responseTypeRef = new ParameterizedTypeReference<OcpiResponse<OcnVersionDetails>>() {
+            };
+
+            // Make the HTTP request
+            HttpHeaders headers = this.createHeaders();
+            OcpiResponse<OcnVersionDetails> response = this._call(url, null, new HashMap<>(), headers,
+                    responseTypeRef, HttpMethod.GET, new ArrayList<>(), null);
+
+            // Return the endpoints from the response
+            if (response != null && response.getData() != null) {
+                return response.getData();
+            }
+            return new OcnVersionDetails();
+        } catch (Exception ex) {
+            log.error("Failed to retrieve OCPI endpoints: {}", ex.getMessage());
+            throw ex;
+        }
+    }
+
     private HttpHeaders createHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Accept", "*/*");
+        headers.add("Authorization", String.format("Token %s", configuration.getTokenC()));
         headers.set("X-Request-ID", UUID.randomUUID().toString());
         headers.set("X-Correlation-ID", UUID.randomUUID().toString());
         headers.set("OCPI-from-country-code", configuration.getFromCountryCode());
