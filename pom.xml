@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.my-oli</groupId>
-    <artifactId>banula-open-library</artifactId>
+    <groupId>com.banula</groupId>
+    <artifactId>open-lib</artifactId>
     <version>0.1.3</version>
     <packaging>jar</packaging>
 
-    <name>banula-open-library</name>
+    <name>open-lib</name>
     <description>Open Library for Banula</description>
     <url>https://github.com/olisystems/banula-open-library</url>
 
