@@ -99,7 +99,8 @@ public class OcnClient {
             verifyAndSetGeneratedTokenC(generatedTokenC);
             OcnVersionDetails endpointResponse = this.getVersionDetails();
 
-            log.info("Version: {}", endpointResponse.getVersion());
+            log.info("OCN Node: Ocpi Version: {} | Endpoints: {}", endpointResponse.getVersion(),
+                    endpointResponse.getEndpoints().size());
             for (Endpoint endpoint : endpointResponse.getEndpoints()) {
                 log.info("Endpoint: {}", endpoint);
             }
