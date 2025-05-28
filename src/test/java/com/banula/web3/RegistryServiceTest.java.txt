@@ -1,0 +1,45 @@
+//package com.banula.web3;
+//
+//import com.banula.web3.model.OcpiParty;
+//import com.banula.web3.service.RegistryService;
+//import com.banula.web3.service.RegistryServiceImpl;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//
+//import java.util.List;
+//import java.util.Optional;
+//
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//
+//@SpringBootTest(classes = RegistryServiceTest.RegistryServiceImplTestContextConfiguration.class)
+//public class RegistryServiceTest {
+//
+//    @Configuration
+//    static class RegistryServiceImplTestContextConfiguration {
+//        @Bean
+//        public RegistryService registryService() {
+//            return new RegistryServiceImpl();
+//        }
+//    }
+//
+//    @Autowired
+//    RegistryService registryService;
+//
+//    @Test
+//    public void test_GetOliRegisteredService() {
+//        List<OcpiParty> parties = registryService.getParties();
+//        Optional<OcpiParty> oliParty = parties.stream().filter(
+//                party ->
+//                        party != null &&
+//                        party.getPartyId().equals("OLC") &&
+//                        party.getCountryCode().equals("DE")
+//        ).findAny();
+//
+//        assertEquals(oliParty.isEmpty(), false);
+//        assertEquals(oliParty.get().getCountryCode(), "DE");
+//        assertEquals(oliParty.get().getPartyId(), "OLC");
+//    }
+//}
