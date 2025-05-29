@@ -20,13 +20,16 @@ public class OCPICustomException extends RuntimeException {
      * @param statusCode The OCPI status code associated with the exception.
      */
     public OCPICustomException(String message, int statusCode) {
+        super(message); // Pass message to parent constructor
         this.errorMessage = message;
         this.statusCode = statusCode;
     }
 
     public OCPICustomException(String message) {
+        super(message); // Pass message to parent constructor
         this.errorMessage = message;
         this.statusCode = Constants.STATUS_CODE_GENERIC_SERVER_ERROR; // default OCPI status code = 3000, means internal
-                                                                      // server error
+                                                                      // // server error
     }
+
 }
