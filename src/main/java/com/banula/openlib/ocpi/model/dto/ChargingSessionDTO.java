@@ -86,6 +86,7 @@ public class ChargingSessionDTO {
     @NotNull
     @JsonProperty("status")
     private SessionStatus status;
+
     @NotNull
     @JsonProperty("last_updated")
     @JsonDeserialize(using = OCPILocalDateTimeDeserializer.class)
