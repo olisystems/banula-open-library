@@ -24,7 +24,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SessionDTO {
+public class ChargingSessionDTO {
     @NotEmpty
     @Size(min = 1, max = 2)
     @JsonProperty("country_code")
@@ -86,6 +86,7 @@ public class SessionDTO {
     @NotNull
     @JsonProperty("status")
     private SessionStatus status;
+
     @NotNull
     @JsonProperty("last_updated")
     @JsonDeserialize(using = OCPILocalDateTimeDeserializer.class)
