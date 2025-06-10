@@ -27,7 +27,6 @@ public class ChargingSessionMapper {
                 .partyId(sessionDTO.getPartyId())
                 .status(sessionDTO.getStatus())
                 .totalCost(sessionDTO.getTotalCost())
-                .authMethod(sessionDTO.getAuthMethod())
                 .build();
     }
 
