@@ -34,7 +34,9 @@ public enum ModuleID {
     TARIFFS("tariffs"),
     TOKENS("tokens"),
     CUSTOM_FLEXIBILITY("flexibility"),
-    CUSTOM_SMART_LOCATIONS("smartlocations");
+    CUSTOM_SMART_LOCATIONS("smartlocations"),
+    OCN_RULES("ocnrules"),
+    CUSTOM("custom");
 
     private final String value;
 
