@@ -32,4 +32,5 @@ public class InfoUtils {
     public static String getLibVersion(String groupId, String artifactId) {
         return getDependencyVersion(groupId, artifactId);
     }
+
 }
