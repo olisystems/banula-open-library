@@ -73,8 +73,8 @@ public class PlatformClient {
             }
             platformConfiguration.setOcnVersionDetails(responseBody.getData());
         } catch (Exception ex) {
-            log.error("Error while sending outflow request to platform, error message: {}", ex.getLocalizedMessage());
-            throw new OCPICustomException("Error while sending outflow request to platform");
+            log.error("Error while retrieving or updating OCN version details from platform, error message: {}", ex.getLocalizedMessage());
+            throw new OCPICustomException("Error while retrieving or updating OCN version details from platform");
         }
     }
 
