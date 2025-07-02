@@ -1,5 +1,7 @@
 package com.banula.openlib.ocpi.model.vo;
 
+import org.springframework.data.annotation.Id;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -17,6 +19,7 @@ public class CommandResultResponse {
     @NotNull(message = "UID cannot be null")
     @Size(max = 36, message = "UID cannot be longer than 36 characters")
     @NonNull
+    @Id
     private String uid;
 
     @JsonProperty("command_result")

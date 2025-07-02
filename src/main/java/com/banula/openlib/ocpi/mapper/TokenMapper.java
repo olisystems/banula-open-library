@@ -6,85 +6,44 @@ import com.banula.openlib.ocpi.model.Token;
 import com.banula.openlib.ocpi.model.dto.TokenDTO;
 import com.banula.openlib.ocpi.model.vo.CdrToken;
 import org.mapstruct.Mapper;
+import org.springframework.beans.BeanUtils;
 
 @Mapper(componentModel = "spring")
 public interface TokenMapper {
     static CpoToken toCpoTokenEntity(TokenDTO tokenDTO) {
-        return CpoToken.builder()
-                .uid(tokenDTO.getUid())
-                .groupId(tokenDTO.getGroupId())
-                .valid(tokenDTO.getValid())
-                .issuer(tokenDTO.getIssuer())
-                .type(tokenDTO.getType())
-                .partyId(tokenDTO.getPartyId())
-                .countryCode(tokenDTO.getCountryCode())
-                .energyContract(tokenDTO.getEnergyContract())
-                .visualNumber(tokenDTO.getVisualNumber())
-                .whitelist(tokenDTO.getWhitelist())
-                .contractId(tokenDTO.getContractId())
-                .defaultProfileType(tokenDTO.getDefaultProfileType())
-                .language(tokenDTO.getLanguage())
-                .lastUpdated(tokenDTO.getLastUpdated())
-                .build();
+        if (tokenDTO == null) {
+            return null;
+        }
+        CpoToken cpoToken = new CpoToken();
+        BeanUtils.copyProperties(tokenDTO, cpoToken);
+        return cpoToken;
     }
 
     static EmspToken toEmspTokenEntity(TokenDTO tokenDTO) {
-        if (tokenDTO == null)
+        if (tokenDTO == null) {
             return null;
-        return EmspToken.builder()
-                .uid(tokenDTO.getUid())
-                .groupId(tokenDTO.getGroupId())
-                .valid(tokenDTO.getValid())
-                .issuer(tokenDTO.getIssuer())
-                .type(tokenDTO.getType())
-                .partyId(tokenDTO.getPartyId())
-                .countryCode(tokenDTO.getCountryCode())
-                .energyContract(tokenDTO.getEnergyContract())
-                .visualNumber(tokenDTO.getVisualNumber())
-                .whitelist(tokenDTO.getWhitelist())
-                .contractId(tokenDTO.getContractId())
-                .defaultProfileType(tokenDTO.getDefaultProfileType())
-                .language(tokenDTO.getLanguage())
-                .lastUpdated(tokenDTO.getLastUpdated())
-                .build();
+        }
+        EmspToken emspToken = new EmspToken();
+        BeanUtils.copyProperties(tokenDTO, emspToken);
+        return emspToken;
     }
 
     static TokenDTO toTokenDTO(EmspToken chargingToken) {
-        return TokenDTO.builder()
-                .uid(chargingToken.getUid())
-                .groupId(chargingToken.getGroupId())
-                .valid(chargingToken.getValid())
-                .issuer(chargingToken.getIssuer())
-                .type(chargingToken.getType())
-                .partyId(chargingToken.getPartyId())
-                .countryCode(chargingToken.getCountryCode())
-                .energyContract(chargingToken.getEnergyContract())
-                .visualNumber(chargingToken.getVisualNumber())
-                .whitelist(chargingToken.getWhitelist())
-                .contractId(chargingToken.getContractId())
-                .defaultProfileType(chargingToken.getDefaultProfileType())
-                .language(chargingToken.getLanguage())
-                .lastUpdated(chargingToken.getLastUpdated())
-                .build();
+        if (chargingToken == null) {
+            return null;
+        }
+        TokenDTO tokenDTO = new TokenDTO();
+        BeanUtils.copyProperties(chargingToken, tokenDTO);
+        return tokenDTO;
     }
 
     static TokenDTO toTokenDTO(CpoToken chargingToken) {
-        return TokenDTO.builder()
-                .uid(chargingToken.getUid())
-                .groupId(chargingToken.getGroupId())
-                .valid(chargingToken.getValid())
-                .issuer(chargingToken.getIssuer())
-                .type(chargingToken.getType())
-                .partyId(chargingToken.getPartyId())
-                .countryCode(chargingToken.getCountryCode())
-                .energyContract(chargingToken.getEnergyContract())
-                .visualNumber(chargingToken.getVisualNumber())
-                .whitelist(chargingToken.getWhitelist())
-                .contractId(chargingToken.getContractId())
-                .defaultProfileType(chargingToken.getDefaultProfileType())
-                .language(chargingToken.getLanguage())
-                .lastUpdated(chargingToken.getLastUpdated())
-                .build();
+        if (chargingToken == null) {
+            return null;
+        }
+        TokenDTO tokenDTO = new TokenDTO();
+        BeanUtils.copyProperties(chargingToken, tokenDTO);
+        return tokenDTO;
     }
 
     static CdrToken fromCpoTokenToCdrToken(CpoToken cpoToken) {
@@ -108,22 +67,12 @@ public interface TokenMapper {
     }
 
     static Token toTokenEntity(TokenDTO tokenDTO) {
-        return Token.builder()
-                .uid(tokenDTO.getUid())
-                .groupId(tokenDTO.getGroupId())
-                .valid(tokenDTO.getValid())
-                .issuer(tokenDTO.getIssuer())
-                .type(tokenDTO.getType())
-                .partyId(tokenDTO.getPartyId())
-                .countryCode(tokenDTO.getCountryCode())
-                .energyContract(tokenDTO.getEnergyContract())
-                .visualNumber(tokenDTO.getVisualNumber())
-                .whitelist(tokenDTO.getWhitelist())
-                .contractId(tokenDTO.getContractId())
-                .defaultProfileType(tokenDTO.getDefaultProfileType())
-                .language(tokenDTO.getLanguage())
-                .lastUpdated(tokenDTO.getLastUpdated())
-                .build();
+        if (tokenDTO == null) {
+            return null;
+        }
+        Token token = new Token();
+        BeanUtils.copyProperties(tokenDTO, token);
+        return token;
     }
 
     static CdrToken fromTokenToCdrToken(Token token) {

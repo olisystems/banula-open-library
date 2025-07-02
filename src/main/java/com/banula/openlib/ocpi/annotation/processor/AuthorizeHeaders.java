@@ -34,8 +34,6 @@ public class AuthorizeHeaders {
         return joinPoint.proceed();
     }
 
-    // TODO: We should revisit the token B handling later to understand how the OCN
-    // node implemented the ocpis credentials module.
     public static void authorizeRequestHeaders(String tokenB, String partyId, String countryCode, OcnClient ocnClient) {
         if (tokenB == null
                 || !AuthenticationUtils.extractToken(tokenB).equals(ocnClient.getConfiguration().getTokenB())) {

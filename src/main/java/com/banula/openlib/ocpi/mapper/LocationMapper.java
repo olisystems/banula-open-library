@@ -5,6 +5,7 @@ import com.banula.openlib.ocpi.model.dto.GeoLocationDTO;
 import com.banula.openlib.ocpi.model.dto.LocationDTO;
 import com.banula.openlib.ocpi.model.vo.GeoLocation;
 import org.mapstruct.Mapper;
+import org.springframework.beans.BeanUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,34 +28,11 @@ public interface LocationMapper {
             }
         }
 
-        return Location.builder()
-                .id(locationDTO.getId())
-                .city(locationDTO.getCity())
-                .address(locationDTO.getAddress())
-                .evses(locationDTO.getEvses())
-                .coordinates(geoLocation)
-                .energyMix(locationDTO.getEnergyMix())
-                .name(locationDTO.getName())
-                .countryCode(locationDTO.getCountryCode())
-                .country(locationDTO.getCountry())
-                .lastUpdated(locationDTO.getLastUpdated())
-                .owner(locationDTO.getOwner())
-                .relatedLocations(locationDTO.getRelatedLocations())
-                .directions(locationDTO.getDirections())
-                .images(locationDTO.getImages())
-                .facilities(locationDTO.getFacilities())
-                .openingTimes(locationDTO.getOpeningTimes())
-                .operator(locationDTO.getOperator())
-                .state(locationDTO.getState())
-                .parkingType(locationDTO.getParkingType())
-                .publish(locationDTO.getPublish())
-                .postalCode(locationDTO.getPostalCode())
-                .partyId(locationDTO.getPartyId())
-                .publishAllowedTo(locationDTO.getPublishAllowedTo())
-                .subOperator(locationDTO.getSubOperator())
-                .timeZone(locationDTO.getTimeZone())
-                .chargingWhenClosed(locationDTO.getChargingWhenClosed())
-                .build();
+        Location location = new Location();
+        BeanUtils.copyProperties(locationDTO, location);
+        location.setCoordinates(geoLocation);
+        return location;
+
     }
 
     static LocationDTO toLocationDTO(Location location) {
@@ -67,34 +45,10 @@ public interface LocationMapper {
             geoLocationDTO = new GeoLocationDTO(coordinates.get(0), coordinates.get(1));
         }
 
-        return LocationDTO.builder()
-                .id(location.getId())
-                .city(location.getCity())
-                .address(location.getAddress())
-                .evses(location.getEvses())
-                .coordinates(geoLocationDTO)
-                .energyMix(location.getEnergyMix())
-                .name(location.getName())
-                .countryCode(location.getCountryCode())
-                .country(location.getCountry())
-                .lastUpdated(location.getLastUpdated())
-                .owner(location.getOwner())
-                .relatedLocations(location.getRelatedLocations())
-                .directions(location.getDirections())
-                .images(location.getImages())
-                .facilities(location.getFacilities())
-                .openingTimes(location.getOpeningTimes())
-                .operator(location.getOperator())
-                .state(location.getState())
-                .parkingType(location.getParkingType())
-                .publish(location.getPublish())
-                .postalCode(location.getPostalCode())
-                .partyId(location.getPartyId())
-                .publishAllowedTo(location.getPublishAllowedTo())
-                .subOperator(location.getSubOperator())
-                .timeZone(location.getTimeZone())
-                .chargingWhenClosed(location.getChargingWhenClosed())
-                .build();
+        LocationDTO locationDTO = new LocationDTO();
+        BeanUtils.copyProperties(location, locationDTO);
+        locationDTO.setCoordinates(geoLocationDTO);
+        return locationDTO;
     }
 
     static List<LocationDTO> toListLocationDTO(List<Location> locations) {

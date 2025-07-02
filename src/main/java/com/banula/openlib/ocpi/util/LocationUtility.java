@@ -117,7 +117,6 @@ public abstract class LocationUtility {
         return query;
     }
 
-    // TODO implement it in ArrayList overlapping IndexOf method
     public static int indexOf(List<EVSE> evses, EVSE evse) {
         for (int i = 0; i < evses.size(); i++) {
             if (evses.get(i).getUid().equals(evse.getUid())) {
