@@ -3,6 +3,7 @@ package com.banula.openlib.ocpi.mapper;
 import com.banula.openlib.ocpi.model.Tariff;
 import com.banula.openlib.ocpi.model.dto.TariffDTO;
 import org.mapstruct.Mapper;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,46 +12,21 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface TariffMapper {
         static Tariff toTariffEntity(TariffDTO tariffDTO) {
-                return tariffDTO == null ? null
-                                : Tariff
-                                                .builder()
-                                                .id(tariffDTO.getId())
-                                                .countryCode(tariffDTO.getCountryCode())
-                                                .endDateTime(tariffDTO.getEndDateTime())
-                                                .tariffAltUrl(tariffDTO.getTariffAltUrl())
-                                                .type(tariffDTO.getType())
-                                                .energyMix(tariffDTO.getEnergyMix())
-                                                .tariffAltText(tariffDTO.getTariffAltText())
-                                                .lastUpdated(tariffDTO.getLastUpdated())
-                                                .maxPrice(tariffDTO.getMaxPrice())
-                                                .minPrice(tariffDTO.getMinPrice())
-                                                .currency(tariffDTO.getCurrency())
-                                                .elements(tariffDTO.getElements())
-                                                .partyId(tariffDTO.getPartyId())
-                                                .startDateTime(tariffDTO.getStartDateTime())
-                                                .build();
+                if (tariffDTO == null) {
+                        return null;
+                }
+                Tariff tariff = new Tariff();
+                BeanUtils.copyProperties(tariffDTO, tariff);
+                return tariff;
         }
 
         static TariffDTO toTariffDTO(Tariff tariff) {
-                return tariff == null ? null
-                                : TariffDTO
-                                                .builder()
-                                                .id(tariff.getId())
-                                                .countryCode(tariff.getCountryCode())
-                                                .endDateTime(tariff.getEndDateTime())
-                                                .tariffAltUrl(tariff.getTariffAltUrl())
-                                                .type(tariff.getType())
-                                                .energyMix(tariff.getEnergyMix())
-                                                .tariffAltText(tariff.getTariffAltText())
-                                                .lastUpdated(tariff.getLastUpdated() == null ? LocalDateTime.now()
-                                                                : tariff.getLastUpdated())
-                                                .maxPrice(tariff.getMaxPrice())
-                                                .minPrice(tariff.getMinPrice())
-                                                .currency(tariff.getCurrency())
-                                                .elements(tariff.getElements())
-                                                .partyId(tariff.getPartyId())
-                                                .startDateTime(tariff.getStartDateTime())
-                                                .build();
+                if (tariff == null) {
+                        return null;
+                }
+                TariffDTO tariffDto = new TariffDTO();
+                BeanUtils.copyProperties(tariff, tariffDto);
+                return tariffDto;
         }
 
         static List<TariffDTO> toListTariffDTO(List<Tariff> tariffs) {
