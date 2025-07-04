@@ -10,6 +10,7 @@ import com.banula.openlib.ocpi.model.enums.Status;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -45,13 +46,14 @@ public class EVSE {
     /**
      * Compliant with the following specification for EVSE ID from "eMI3 standard
      * version V1.0"
-     * (http://emi3group.com/documents-links/) "Part 2: business objects." Optional
+     * (<a href="http://emi3group.com/documents-links/">EMI3 reference</a>) "Part 2: business objects." Optional
      * because: if an evse_id is
      * to be re-used in the real world, the evse_id can be removed from an EVSE
      * object if the status is set to REMOVED.
      */
     @JsonProperty("evse_id")
     @Size(max = 48, message = "EVSE ID cannot be longer than 48 characters")
+    @NotEmpty(message = "EvseId is a required field in Banula style of Charging")
     private String evseId;
 
     /**

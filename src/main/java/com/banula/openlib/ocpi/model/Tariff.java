@@ -119,9 +119,11 @@ public class Tariff {
 
     /**
      * Details on the energy supplied with this tariff.
+     * This field is required in Banula, in order to differentiate traditional roaming from ours.
      */
     @JsonProperty("energy_mix")
     @Valid
+    @NotNull(message = "energy_mix is a required field in Banula Style of Charging.")
     private EnergyMix energyMix;
 
     /**
