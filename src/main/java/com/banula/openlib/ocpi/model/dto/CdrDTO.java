@@ -66,7 +66,6 @@ public class CdrDTO {
 
     @Size(min = 1, max = 36, message = "Authorization reference must be between 1 and 36 characters long")
     @JsonProperty("authorization_reference")
-    @NotEmpty(message = "authorization_reference is required in Banula style of Charging")
     private String authorizationReference;
 
     @NotNull(message = "CDR location must not be blank")

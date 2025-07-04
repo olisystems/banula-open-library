@@ -58,7 +58,6 @@ public class ChargingSessionDTO {
     @JsonProperty("auth_method")
     private AuthMethod authMethod;
     @Size(min = 1, max = 36)
-    @NotEmpty(message = "authorization_reference is required in Banula style of charging")
     @JsonProperty("authorization_reference")
     private String authorizationReference;
     @NotEmpty
@@ -83,7 +82,6 @@ public class ChargingSessionDTO {
     @JsonProperty("charging_periods")
     private List<ChargingPeriod> chargingPeriods;
     @JsonProperty("total_cost")
-    @NotNull(message = "total_cost is required in Banula style of charging")
     private Price totalCost;
     @NotNull
     @JsonProperty("status")
