@@ -30,8 +30,6 @@ public class PlatformClient {
     private final RestTemplate restTemplate;
     private final PlatformConfiguration platformConfiguration;
 
-    // TODO the idea of this endpoint is to replace the OcnClient class for API
-    // Roles communication with the Platform
     public <T, N> OcpiResponse<T> sendOutflowRequest(String toOcpiCountryCode, String toOcpiPartyId,
             InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body, Class<T> refType) {
         log.info("Sending outflow request to platform for country code: {} and party id: {}", toOcpiCountryCode,
@@ -73,7 +71,8 @@ public class PlatformClient {
             }
             platformConfiguration.setOcnVersionDetails(responseBody.getData());
         } catch (Exception ex) {
-            log.error("Error while retrieving or updating OCN version details from platform, error message: {}", ex.getLocalizedMessage());
+            log.error("Error while retrieving or updating OCN version details from platform, error message: {}",
+                    ex.getLocalizedMessage());
             throw new OCPICustomException("Error while retrieving or updating OCN version details from platform");
         }
     }
