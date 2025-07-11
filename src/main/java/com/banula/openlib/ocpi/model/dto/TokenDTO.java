@@ -79,10 +79,12 @@ public class TokenDTO {
 
     @JsonProperty("energy_contract")
     @Valid
+    @NotNull(message = "energy_contract is a required field in Banula style of charging")
     private EnergyContract energyContract;
 
     @JsonProperty("last_updated")
     @JsonDeserialize(using = OCPILocalDateTimeDeserializer.class)
     @JsonSerialize(using = OCPILocalDateTimeSerializer.class)
+    @NotNull
     private LocalDateTime lastUpdated;
 }

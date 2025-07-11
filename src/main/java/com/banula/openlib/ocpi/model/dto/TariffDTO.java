@@ -64,6 +64,7 @@ public class TariffDTO {
     private LocalDateTime endDateTime;
     @JsonProperty("energy_mix")
     @Valid
+    @NotNull(message = "energy_mix is a required field in Banula Style of Charging.")
     private EnergyMix energyMix;
 
     @JsonProperty("last_updated")

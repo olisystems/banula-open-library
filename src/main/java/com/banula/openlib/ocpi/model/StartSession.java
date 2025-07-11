@@ -35,22 +35,21 @@ public class StartSession {
     private String locationId;
 
     /**
-     * Optional EVSE.uid of the EVSE of this Location on which a session is to be
+     * Required EVSE.uid of the EVSE of this Location on which a session is to be
      * started.
-     * Required when connector_id is set.
+     * Required field in Banula world.
      */
     @JsonProperty("evse_uid")
     @Size(max = 36, message = "EvseUid longer than 36 characters")
+    @NotEmpty(message = "evse_uid is a required field in Banula style of charging.")
     private String evseUid;
 
     /*
-     * Optional Connector.id of the Connector of the EVSE on which a session is to
-     * be started.
-     * This field is required when the capability: START_SESSION_CONNECTOR_REQUIRED
-     * is set on the EVSE.
+     * Required field in Banula world.
      */
     @JsonProperty("connector_id")
     @Size(max = 36, message = "ConnectorId longer than 36 characters")
+    @NotEmpty(message = "connector_id is a required field in Banula style of Charging.")
     private String connectorId;
 
     /**
@@ -60,6 +59,7 @@ public class StartSession {
      */
     @JsonProperty("authorization_reference")
     @Size(max = 36, message = "authorizationReference longer than 36 characters")
+    @NotEmpty(message = "authorization_reference is a required field in Banula style of Charging")
     private String authorizationReference;
 
     @NotNull(message = "response_url cannot be empty.")
