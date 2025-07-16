@@ -36,6 +36,7 @@ public enum ModuleID {
     CUSTOM_FLEXIBILITY("flexibility"),
     CUSTOM_SMART_LOCATIONS("smartlocations"),
     OCN_RULES("ocnrules"),
+    VERSIONS("versions"),
     CUSTOM("custom");
 
     private final String value;
