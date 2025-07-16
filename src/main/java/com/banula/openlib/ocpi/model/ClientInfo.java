@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
+@SuperBuilder
 public class ClientInfo {
 
     /**
