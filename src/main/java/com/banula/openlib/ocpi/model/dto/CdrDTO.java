@@ -136,8 +136,8 @@ public class CdrDTO {
     @JsonProperty("credit_reference_id")
     private String creditReferenceId;
 
-    // @JsonProperty("home_charging_compensation")
-    // private Boolean homeChargingCompensation;
+    @JsonProperty("home_charging_compensation")
+    private Boolean homeChargingCompensation;
 
     @NotNull(message = "Last updated must not be blank")
     @JsonProperty("last_updated")
