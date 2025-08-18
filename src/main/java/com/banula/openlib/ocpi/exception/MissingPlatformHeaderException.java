@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class MissingPlatformHeaderException extends RuntimeException {
-  public MissingPlatformHeaderException(String countryHeader, String partyHeader) {
-    super("Missing required headers: '" + countryHeader + "' and/or '" + partyHeader + "'");
+  public MissingPlatformHeaderException(String countryParam, String partyParam) {
+    super("Missing required platform parameters: '" + countryParam + "' and/or '" + partyParam + "'");
   }
 }
