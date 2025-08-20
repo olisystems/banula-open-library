@@ -11,17 +11,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface PlatformRequest {
 
-  // Legacy header-based configuration (deprecated)
-  @Deprecated
-  String countryHeader() default "countryCode";
-
-  @Deprecated
-  String partyHeader() default "partyId";
-
-  // New URL path-based configuration
-  String countryPath() default "countryCode";
-
-  String partyPath() default "partyId";
+  String tenantPath() default "tenant";
 
   boolean required() default true;
 }

@@ -21,7 +21,8 @@ import java.util.Map;
 
 /**
  * Resolves method parameters annotated with {@link PlatformRequest} into
- * {@link PlatformRequestValues} by extracting values from URL path parameters.
+ * {@link PlatformRequestValues} by extracting tenant identifier from URL path
+ * parameters.
  */
 public class PlatformHeadersResolver implements HandlerMethodArgumentResolver {
 
@@ -49,49 +50,39 @@ public class PlatformHeadersResolver implements HandlerMethodArgumentResolver {
       return null;
     }
 
-    String countryCode;
-    String partyId;
+    String tenant;
 
-    // Try to extract from URL path parameters first
+    // Extract from URL path parameters
     @SuppressWarnings("unchecked")
     Map<String, String> pathVariables = (Map<String, String>) request.getAttribute(
         HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
     if (pathVariables != null) {
-      // Extract from URL path parameters
-      countryCode = pathVariables.get(annotation.countryPath());
-      partyId = pathVariables.get(annotation.partyPath());
+      tenant = pathVariables.get(annotation.tenantPath());
     } else {
-      // Fallback to headers for backward compatibility
-      String countryHeaderName = annotation.countryHeader();
-      String partyHeaderName = annotation.partyHeader();
-      countryCode = request.getHeader(countryHeaderName);
-      partyId = request.getHeader(partyHeaderName);
+      tenant = null;
     }
 
-    if (annotation.required()) {
-      if (countryCode == null || partyId == null) {
-        throw new MissingPlatformHeaderException(annotation.countryPath(), annotation.partyPath());
-      }
+    if (annotation.required() && tenant == null) {
+      throw new MissingPlatformHeaderException(annotation.tenantPath(), "tenant");
     }
 
     // Validate platform request if validation component exists
-    if (countryCode != null && partyId != null) {
-      validatePlatformRequest(countryCode, partyId);
+    if (tenant != null) {
+      validatePlatformRequest(tenant);
     }
 
-    return new PlatformRequestValues(countryCode, partyId);
+    return new PlatformRequestValues(tenant);
   }
 
   /**
    * Validates platform request by checking if a validation component exists
    * and calling its validatePlatformRequest method.
    * 
-   * @param countryCode the country code to validate
-   * @param partyId     the party ID to validate
+   * @param tenant the tenant identifier to validate
    * @throws PlatformPartyNotRegistered if validation fails
    */
-  private void validatePlatformRequest(String countryCode, String partyId) {
+  private void validatePlatformRequest(String tenant) {
     try {
       // Look for any component that implements PlatformRequestValidator
       String[] beanNames = applicationContext.getBeanNamesForType(PlatformRequestValidator.class);
@@ -100,8 +91,8 @@ public class PlatformHeadersResolver implements HandlerMethodArgumentResolver {
         // Get the first validator (you could also iterate through all if needed)
         PlatformRequestValidator validator = applicationContext.getBean(beanNames[0], PlatformRequestValidator.class);
 
-        if (!validator.validatePlatformRequest(countryCode, partyId)) {
-          throw new PlatformPartyNotRegistered(countryCode, partyId);
+        if (!validator.validatePlatformRequest(tenant)) {
+          throw new PlatformPartyNotRegistered(tenant);
         }
       }
       // If no validation component found, assume valid (optional validation)
@@ -110,7 +101,7 @@ public class PlatformHeadersResolver implements HandlerMethodArgumentResolver {
         throw e;
       }
       // For any other exception, throw PlatformPartyNotRegistered
-      throw new PlatformPartyNotRegistered(countryCode, partyId);
+      throw new PlatformPartyNotRegistered(tenant);
     }
   }
 }

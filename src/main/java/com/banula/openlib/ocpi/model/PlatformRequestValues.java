@@ -8,6 +8,5 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class PlatformRequestValues {
-  private final String countryCode;
-  private final String partyId;
+  private final String tenant;
 }

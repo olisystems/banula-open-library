@@ -7,11 +7,10 @@ package com.banula.openlib.ocpi.validation;
 public interface PlatformRequestValidator {
 
   /**
-   * Validates if a platform party is registered.
+   * Validates if a platform party is registered using tenant identifier.
    * 
-   * @param countryCode the country code to validate
-   * @param partyId     the party ID to validate
+   * @param tenant the tenant identifier to validate
    * @return true if the platform party is registered, false otherwise
    */
-  boolean validatePlatformRequest(String countryCode, String partyId);
+  boolean validatePlatformRequest(String tenant);
 }
