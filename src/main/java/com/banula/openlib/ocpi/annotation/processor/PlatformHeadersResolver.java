@@ -6,11 +6,12 @@ import com.banula.openlib.ocpi.exception.PlatformPartyNotRegistered;
 import com.banula.openlib.ocpi.model.PlatformRequestValues;
 import com.banula.openlib.ocpi.validation.PlatformRequestValidator;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -24,10 +25,11 @@ import java.util.Map;
  * {@link PlatformRequestValues} by extracting tenant identifier from URL path
  * parameters.
  */
+@Component
+@RequiredArgsConstructor
 public class PlatformHeadersResolver implements HandlerMethodArgumentResolver {
 
-  @Autowired
-  private ApplicationContext applicationContext;
+  private final ApplicationContext applicationContext;
 
   @Override
   public boolean supportsParameter(@NonNull MethodParameter parameter) {
