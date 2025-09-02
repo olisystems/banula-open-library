@@ -1,12 +1,14 @@
 package com.banula.openlib.ocpi.platform;
 
+import java.util.HashMap;
+
 import com.banula.openlib.ocn.model.OcnVersionDetails;
 
 public interface PlatformConfiguration {
     String getPlatformUrl();
 
-    OcnVersionDetails getOcnVersionDetails();
+    HashMap<String, OcnVersionDetails> getOcnVersionDetails();
 
-    void setOcnVersionDetails(OcnVersionDetails ocnVersionDetails);
+    void setOcnVersionDetails(String tenantId, OcnVersionDetails ocnVersionDetails);
 
 }
