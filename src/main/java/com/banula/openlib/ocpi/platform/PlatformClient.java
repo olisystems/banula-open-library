@@ -140,8 +140,8 @@ public class PlatformClient {
                 .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
         String url = endpoint.getUrl();
         int startIndex = url.indexOf("ocpi/");
-        String endpointUrl = url.substring(startIndex);
-        return platformConfiguration.getPlatformUrl() + "/proxy/ocpi/outflow/" + endpointUrl;
+        String endpointUrl = url.substring(startIndex + 5); // +5 to skip "ocpi/"
+        return platformConfiguration.getPlatformUrl() + "/" + tenantId + "/proxy/ocpi/outflow/" + endpointUrl;
 
     }
 
