@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.BeanUtils;
+
 public class SmartLocationMapper {
 
     public static SmartLocation toSmartLocationEntity(SmartLocationDTO smartLocationDTO) {
@@ -21,39 +23,10 @@ public class SmartLocationMapper {
                 : new GeoLocation(Double.parseDouble(smartLocationDTO.getCoordinates().getLatitude()),
                         Double.parseDouble(smartLocationDTO.getCoordinates().getLongitude()));
 
-        return SmartLocation.builder()
-                .id(smartLocationDTO.getId())
-                .city(smartLocationDTO.getCity())
-                .address(smartLocationDTO.getAddress())
-                .evses(smartLocationDTO.getEvses())
-                .coordinates(geoLocation)
-                .energyMix(smartLocationDTO.getEnergyMix())
-                .name(smartLocationDTO.getName())
-                .countryCode(smartLocationDTO.getCountryCode())
-                .country(smartLocationDTO.getCountry())
-                .lastUpdated(smartLocationDTO.getLastUpdated())
-                .owner(smartLocationDTO.getOwner())
-                .relatedLocations(smartLocationDTO.getRelatedLocations())
-                .directions(smartLocationDTO.getDirections())
-                .images(smartLocationDTO.getImages())
-                .facilities(smartLocationDTO.getFacilities())
-                .openingTimes(smartLocationDTO.getOpeningTimes())
-                .operator(smartLocationDTO.getOperator())
-                .state(smartLocationDTO.getState())
-                .parkingType(smartLocationDTO.getParkingType())
-                .publish(smartLocationDTO.getPublish())
-                .postalCode(smartLocationDTO.getPostalCode())
-                .partyId(smartLocationDTO.getPartyId())
-                .publishAllowedTo(smartLocationDTO.getPublishAllowedTo())
-                .subOperator(smartLocationDTO.getSubOperator())
-                .timeZone(smartLocationDTO.getTimeZone())
-                .chargingWhenClosed(smartLocationDTO.getChargingWhenClosed())
-                // Smart Location Fields
-                .defaultSupplier(smartLocationDTO.getDefaultSupplier())
-                .malo(smartLocationDTO.getMalo())
-                .smartMeterId(smartLocationDTO.getSmartMeterId())
-                .messageQueueUrl(smartLocationDTO.getMessageQueueUrl())
-                .build();
+        SmartLocation smartLocation = new SmartLocation();
+        BeanUtils.copyProperties(smartLocationDTO, smartLocation);
+        smartLocation.setCoordinates(geoLocation);
+        return smartLocation;
     }
 
     public static SmartLocationDTO toSmartLocationDTO(SmartLocation location) {
@@ -65,39 +38,10 @@ public class SmartLocationMapper {
                         : new GeoLocationDTO(location.getCoordinates().getCoordinates().get(0),
                                 location.getCoordinates().getCoordinates().get(1));
 
-        return SmartLocationDTO.builder()
-                .id(location.getId())
-                .city(location.getCity())
-                .address(location.getAddress())
-                .evses(location.getEvses())
-                .coordinates(geoLocationDTO)
-                .energyMix(location.getEnergyMix())
-                .name(location.getName())
-                .countryCode(location.getCountryCode())
-                .country(location.getCountry())
-                .lastUpdated(location.getLastUpdated())
-                .owner(location.getOwner())
-                .relatedLocations(location.getRelatedLocations())
-                .directions(location.getDirections())
-                .images(location.getImages())
-                .facilities(location.getFacilities())
-                .openingTimes(location.getOpeningTimes())
-                .operator(location.getOperator())
-                .state(location.getState())
-                .parkingType(location.getParkingType())
-                .publish(location.getPublish())
-                .postalCode(location.getPostalCode())
-                .partyId(location.getPartyId())
-                .publishAllowedTo(location.getPublishAllowedTo())
-                .subOperator(location.getSubOperator())
-                .timeZone(location.getTimeZone())
-                .chargingWhenClosed(location.getChargingWhenClosed())
-                // Smart Location Fields
-                .defaultSupplier(location.getDefaultSupplier())
-                .malo(location.getMalo())
-                .smartMeterId(location.getSmartMeterId())
-                .messageQueueUrl(location.getMessageQueueUrl())
-                .build();
+        SmartLocationDTO smartLocationDTO = new SmartLocationDTO();
+        BeanUtils.copyProperties(location, smartLocationDTO);
+        smartLocationDTO.setCoordinates(geoLocationDTO);
+        return smartLocationDTO;
     }
 
     public static List<SmartLocationDTO> toListSmartLocationDTO(List<SmartLocation> entities) {
