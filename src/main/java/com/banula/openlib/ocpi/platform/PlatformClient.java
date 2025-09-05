@@ -141,7 +141,7 @@ public class PlatformClient {
         String url = endpoint.getUrl();
         int startIndex = url.indexOf("ocpi/");
         String endpointUrl = url.substring(startIndex + 5); // +5 to skip "ocpi/"
-        return platformConfiguration.getPlatformUrl() + "/" + tenantId + "/proxy/ocpi/outflow/" + endpointUrl;
+        return platformConfiguration.getPlatformUrl() + "/" + tenantId + "/ocpi/proxy/outflow/" + endpointUrl;
 
     }
 
