@@ -133,6 +133,9 @@ public class PlatformClient {
         if (platformConfiguration.getOcnVersionDetails() == null) {
             throw new IllegalArgumentException("OCN version details not found");
         }
+        if (platformConfiguration.getOcnVersionDetails().get(tenantId) == null) {
+            throw new IllegalArgumentException("Tenant not found in OcnVersionDetails");
+        }
 
         Endpoint endpoint = platformConfiguration.getOcnVersionDetails().get(tenantId).getEndpoints().stream()
                 .filter(e -> e.getIdentifier() == moduleID && e.getRole() == interfaceRole)
