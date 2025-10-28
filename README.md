@@ -230,6 +230,44 @@ We welcome contributions to the Banula Open Library! Here's how you can help:
    mvn test
    ```
 
+## How to Deploy on Maven Central
+
+### Prerequisites
+
+Before deploying, ensure you have:
+- GPG keys configured for signing artifacts
+- Maven Central credentials in `~/.m2/settings.xml` with server id `central`
+- Incremented the version number in `pom.xml` (Maven Central doesn't allow redeploying the same version)
+
+### Deployment Steps
+
+1. **Update the version** in `pom.xml`:
+   ```xml
+   <version>0.1.18</version> <!-- Increment from previous version -->
+   ```
+
+2. **Deploy to Maven Central** using the `release` profile:
+   ```bash
+   ./mvnw -P release -DskipTests clean deploy
+   ```
+
+   The `release` profile:
+   - Skips the fat jar assembly to reduce bundle size
+   - Includes only the standard jar, sources, and javadoc
+   - Signs all artifacts with GPG
+   - Automatically uploads and publishes to Maven Central
+
+3. **Verify deployment**:
+   - Check the build output for `BUILD SUCCESS`
+   - Look for confirmation: `Deployment was successfully published`
+   - The artifact will be available on Maven Central within 15-30 minutes
+
+### Troubleshooting
+
+- **"Broken pipe" errors**: Usually caused by oversized bundles. The `release` profile prevents this by skipping the fat jar.
+- **"Already exists" errors**: Increment the version number in `pom.xml`.
+- **Authentication errors**: Verify your `~/.m2/settings.xml` has valid credentials for server id `central`.
+
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
