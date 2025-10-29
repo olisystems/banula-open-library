@@ -1,18 +1,8 @@
 package com.banula.openlib.ocn.client;
 
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
-import com.banula.openlib.ocn.model.OcnClientConfiguration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -255,13 +245,22 @@ public class OcnClient {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder
                 .fromHttpUrl(configuration.getNodeUrl() + endpoint.toString());
         addPathAndQueryParams(uriBuilder, pathVariables, requestParameters);
+        String finalUrl = uriBuilder.encode().toUriString();
+
+        // Log the curl command
+        logCurlCommand(finalUrl, httpMethod, headers, requestBody);
+
         ResponseEntity<T> response = restTemplate.exchange(
-                uriBuilder.encode().toUriString(),
+                finalUrl,
                 httpMethod,
                 entity,
                 responseTypeRef);
 
-        return response.getBody();
+        T responseBody = response.getBody();
+        if (responseBody instanceof OcpiResponse) {
+            ((OcpiResponse<?>) responseBody).setHeaders(response.getHeaders());
+        }
+        return responseBody;
     }
 
     public <T, N> OcpiResponse<T> executeOcpiOperation(String url, N body, String toPartyId, String toCountryCode,
@@ -315,13 +314,22 @@ public class OcnClient {
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
         addPathAndQueryParams(uriBuilder, pathVariables, requestParameters);
+        String finalUrl = uriBuilder.encode().toUriString();
+
+        // Log the curl command
+        logCurlCommand(finalUrl, httpMethod, headers, requestBody);
+
         ResponseEntity<T> response = restTemplate.exchange(
-                uriBuilder.encode().toUriString(),
+                finalUrl,
                 httpMethod,
                 entity,
                 responseTypeRef);
 
-        return response.getBody();
+        T responseBody = response.getBody();
+        if (responseBody instanceof OcpiResponse) {
+            ((OcpiResponse<?>) responseBody).setHeaders(response.getHeaders());
+        }
+        return responseBody;
     }
 
     private void addPathAndQueryParams(UriComponentsBuilder uriBuilder, List<String> pathVariables,
@@ -337,6 +345,55 @@ public class OcnClient {
                 uriBuilder.queryParam(entry.getKey(), entry.getValue());
             }
         }
+    }
+
+    /**
+     * Logs the exact curl command that would be executed for debugging purposes
+     * 
+     * @param url         The complete URL including query parameters
+     * @param httpMethod  The HTTP method (GET, POST, PUT, DELETE, etc.)
+     * @param headers     The HTTP headers
+     * @param requestBody The request body as a JSON string
+     */
+    private void logCurlCommand(String url, HttpMethod httpMethod, HttpHeaders headers, String requestBody) {
+        if (!configuration.isLogCurlCommand()) {
+            return;
+        }
+        StringBuilder curlCommand = new StringBuilder();
+        curlCommand.append("curl -X ").append(httpMethod.name());
+
+        // Add all headers
+        if (headers != null) {
+            headers.forEach((headerName, headerValues) -> {
+                for (String headerValue : headerValues) {
+                    curlCommand.append("  -H '").append(headerName).append(": ").append(escapeSingleQuotes(headerValue))
+                            .append("'");
+                }
+            });
+        }
+
+        // Add request body if present (for POST, PUT, PATCH methods)
+        if (requestBody != null && !requestBody.isEmpty() && !"null".equals(requestBody)) {
+            curlCommand.append(" -d '").append(escapeSingleQuotes(requestBody)).append("'");
+        }
+
+        // Add URL
+        curlCommand.append(" ").append(url);
+
+        log.info("Executing request:\n{}", curlCommand.toString());
+    }
+
+    /**
+     * Escapes single quotes in a string for use in shell commands
+     * 
+     * @param input The string to escape
+     * @return The escaped string
+     */
+    private String escapeSingleQuotes(String input) {
+        if (input == null) {
+            return "";
+        }
+        return input.replace("'", "'\\''");
     }
 
     private <N> void addSignatureIfSupported(HttpHeaders headers, N body, HashMap<String, String> params)
