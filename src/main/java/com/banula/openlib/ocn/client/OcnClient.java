@@ -366,7 +366,7 @@ public class OcnClient {
         if (headers != null) {
             headers.forEach((headerName, headerValues) -> {
                 for (String headerValue : headerValues) {
-                    curlCommand.append("  -H '").append(headerName).append(": ").append(escapeSingleQuotes(headerValue))
+                    curlCommand.append(" -H '").append(headerName).append(": ").append(escapeSingleQuotes(headerValue))
                             .append("'");
                 }
             });
@@ -378,7 +378,7 @@ public class OcnClient {
         }
 
         // Add URL
-        curlCommand.append(" ").append(url);
+        curlCommand.append(" '").append(url).append("'");
 
         log.info("Executing request:\n{}", curlCommand.toString());
     }
