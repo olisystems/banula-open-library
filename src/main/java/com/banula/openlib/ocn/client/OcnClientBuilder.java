@@ -82,6 +82,11 @@ public class OcnClientBuilder {
         return this;
     }
 
+    public OcnClientBuilder setLogCurlCommand(boolean logCurlCommand) {
+        this.configuration.setLogCurlCommand(logCurlCommand);
+        return this;
+    }
+
     public OcnClient build() {
         return new OcnClient(this.configuration, ocnCredentialHandler, ocnVersionDetailsHandler);
     }

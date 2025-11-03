@@ -1,5 +1,6 @@
 package com.banula.openlib.ocpi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.banula.openlib.ocn.client.OcnClient;
@@ -9,6 +10,7 @@ import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpHeaders;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +26,9 @@ public class OcpiResponse<T> {
     @JsonDeserialize(using = OCPILocalDateTimeDeserializer.class)
     @JsonSerialize(using = OCPILocalDateTimeSerializer.class)
     private LocalDateTime timestamp;
+
+    @JsonIgnore
+    private HttpHeaders headers;
 
     public OcpiResponse(T data, int statusCode, String statusMessage) {
         this.data = data;

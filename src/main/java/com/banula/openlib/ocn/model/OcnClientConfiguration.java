@@ -23,4 +23,5 @@ public class OcnClientConfiguration {
     private String partyBackendUrl;
     private boolean updatingParty;
     private String integrationTestParameter;
+    private boolean logCurlCommand;
 }
