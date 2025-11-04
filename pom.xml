@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.my-oli</groupId>
     <artifactId>banula-open-library</artifactId>
-    <version>0.1.19</version>
+    <version>0.1.20</version>
     <packaging>jar</packaging>
 
     <name>banula-open-library</name>
