@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 
 import java.io.File;
 import java.io.FileReader;
@@ -31,6 +33,38 @@ public class InfoUtils {
 
     public static String getLibVersion(String groupId, String artifactId) {
         return getDependencyVersion(groupId, artifactId);
+    }
+
+    public static void logCurlCommand(String url, HttpMethod httpMethod, HttpHeaders headers, String requestBody) {
+
+        StringBuilder curlCommand = new StringBuilder();
+        curlCommand.append("curl -X ").append(httpMethod.name());
+
+        // Add all headers
+        if (headers != null) {
+            headers.forEach((headerName, headerValues) -> {
+                for (String headerValue : headerValues) {
+                    curlCommand.append(" -H '").append(headerName).append(": ").append(escapeSingleQuotes(headerValue))
+                            .append("'");
+                }
+            });
+        }
+
+        // Add request body if present (for POST, PUT, PATCH methods)
+        if (requestBody != null && !requestBody.isEmpty() && !"null".equals(requestBody)) {
+            curlCommand.append(" -d '").append(escapeSingleQuotes(requestBody)).append("'");
+        }
+
+        // Add URL
+        curlCommand.append(" '").append(url).append("'");
+        log.info("Executing request:\n{}", curlCommand.toString());
+    }
+
+    private static String escapeSingleQuotes(String input) {
+        if (input == null) {
+            return "";
+        }
+        return input.replace("'", "'\\''");
     }
 
 }

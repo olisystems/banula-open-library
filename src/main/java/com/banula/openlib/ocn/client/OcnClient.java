@@ -22,6 +22,7 @@ import com.banula.openlib.ocpi.model.enums.Role;
 import com.banula.openlib.ocpi.model.vo.BusinessDetails;
 import com.banula.openlib.ocpi.model.vo.CredentialsRole;
 import com.banula.openlib.ocpi.model.vo.Endpoint;
+import com.banula.openlib.ocpi.util.InfoUtils;
 
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -359,41 +360,7 @@ public class OcnClient {
         if (!configuration.isLogCurlCommand()) {
             return;
         }
-        StringBuilder curlCommand = new StringBuilder();
-        curlCommand.append("curl -X ").append(httpMethod.name());
-
-        // Add all headers
-        if (headers != null) {
-            headers.forEach((headerName, headerValues) -> {
-                for (String headerValue : headerValues) {
-                    curlCommand.append(" -H '").append(headerName).append(": ").append(escapeSingleQuotes(headerValue))
-                            .append("'");
-                }
-            });
-        }
-
-        // Add request body if present (for POST, PUT, PATCH methods)
-        if (requestBody != null && !requestBody.isEmpty() && !"null".equals(requestBody)) {
-            curlCommand.append(" -d '").append(escapeSingleQuotes(requestBody)).append("'");
-        }
-
-        // Add URL
-        curlCommand.append(" '").append(url).append("'");
-
-        log.info("Executing request:\n{}", curlCommand.toString());
-    }
-
-    /**
-     * Escapes single quotes in a string for use in shell commands
-     * 
-     * @param input The string to escape
-     * @return The escaped string
-     */
-    private String escapeSingleQuotes(String input) {
-        if (input == null) {
-            return "";
-        }
-        return input.replace("'", "'\\''");
+        InfoUtils.logCurlCommand(url, httpMethod, headers, requestBody);
     }
 
     private <N> void addSignatureIfSupported(HttpHeaders headers, N body, HashMap<String, String> params)

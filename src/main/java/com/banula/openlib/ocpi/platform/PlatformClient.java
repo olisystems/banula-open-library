@@ -54,8 +54,8 @@ public class PlatformClient {
 
     public void updateOcnVersionDetailsFromPlatform(String tenantId) {
         try {
-            log.info("Updating OCN version details from platform | Platform URL: {}",
-                    platformConfiguration.getPlatformUrl());
+            log.info("Updating OCN version details from platform | Tenant ID: {} | Platform URL: {}",
+                    tenantId, platformConfiguration.getPlatformUrl());
             HttpHeaders headers = createHeaders();
             String platformEndpoint = getOcnVersionDetailsUrl(tenantId);
             HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -70,14 +70,14 @@ public class PlatformClient {
             if (responseBody == null) {
                 String msg = String.format("Platform returned empty body for OCN version details (HTTP %d)",
                         httpStatus);
-                log.error(msg);
+                log.error("Tenant ID: {} | {}", tenantId, msg);
                 throw new OCPICustomException(msg);
             }
             if (responseBody.getStatus_code() != 1000) {
                 String msg = String.format(
                         "Platform error retrieving OCN version details: %s (status_code %d, HTTP %d)",
                         responseBody.getStatus_message(), responseBody.getStatus_code(), httpStatus);
-                log.error(msg);
+                log.error("Tenant ID: {} | {}", tenantId, msg);
                 throw new OCPICustomException(msg);
             }
             OcnVersionDetails details = responseBody.getData();
@@ -85,7 +85,7 @@ public class PlatformClient {
                 String msg = String.format(
                         "Platform returned no data for OCN version details (status_code %d, HTTP %d)",
                         responseBody.getStatus_code(), httpStatus);
-                log.error(msg);
+                log.error("Tenant ID: {} | {}", tenantId, msg);
                 throw new OCPICustomException(msg);
             }
             platformConfiguration.setOcnVersionDetails(tenantId, details);
@@ -94,15 +94,15 @@ public class PlatformClient {
             String msg = String.format(
                     "HTTP %d from platform while retrieving OCN version details: %s",
                     rex.getStatusCode().value(), body);
-            log.error(msg);
+            log.error("Tenant ID: {} | {}", tenantId, msg);
             throw new OCPICustomException(msg);
         } catch (NullPointerException npe) {
             String msg = "Failed to store OCN version details: platform configuration storage not initialized";
-            log.error(msg);
+            log.error("Tenant ID: {} | {}", tenantId, msg);
             throw new OCPICustomException(msg);
         } catch (Exception ex) {
-            log.error("Error while retrieving or updating OCN version details from platform, error message: {}",
-                    ex.getLocalizedMessage());
+            log.error("Tenant ID: {} | Error while retrieving or updating OCN version details from platform, error message: {}",
+                    tenantId, ex.getLocalizedMessage());
             throw new OCPICustomException("Error while retrieving or updating OCN version details from platform");
         }
     }
