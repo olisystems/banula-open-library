@@ -23,4 +23,7 @@ public class DefaultSupplier {
     @JsonProperty("balancing_group_eic_id")
     @NotEmpty(message = "Balancing group EIC ID cannot be empty")
     private String balancingGroupEicId;
+
+    @JsonProperty("default_supplier_malo_id")
+    private String defaultSupplierMaloId;
 }
