@@ -1,8 +1,8 @@
 package com.banula.openlib.ocpi.util;
 
 import com.banula.openlib.ocpi.model.ChargingSession;
-import com.banula.openlib.ocpi.model.CpoToken;
 import com.banula.openlib.ocpi.model.Location;
+import com.banula.openlib.ocpi.model.Token;
 import com.banula.openlib.ocpi.model.vo.Connector;
 import com.banula.openlib.ocpi.model.vo.EVSE;
 
@@ -15,8 +15,8 @@ import java.lang.reflect.Field;
 
 public class ModelPatcherUtil {
 
-    public static void tokenPatcher(CpoToken existingToken, CpoToken incompleteToken) throws IllegalAccessException {
-        Class<?> internClass = CpoToken.class;
+    public static void tokenPatcher(Token existingToken, Token incompleteToken) throws IllegalAccessException {
+        Class<?> internClass = Token.class;
         Field[] internFields = internClass.getDeclaredFields();
         for (Field field : internFields) {
             field.setAccessible(true);
