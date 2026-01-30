@@ -12,6 +12,7 @@ import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.experimental.SuperBuilder;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Token {
 
     @JsonProperty("country_code")
