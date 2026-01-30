@@ -1,16 +1,18 @@
 package com.banula.openlib.ocpi.platform;
 
+import org.springframework.http.HttpHeaders;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.banula.openlib.ocn.client.GenericTypeRefUtil;
 import com.banula.openlib.ocn.model.OcnVersionDetails;
@@ -32,16 +34,27 @@ public class PlatformClient {
     private final PlatformConfiguration platformConfiguration;
 
     public <T, N> OcpiResponse<T> sendOutflowRequest(String tenantId, String toOcpiCountryCode, String toOcpiPartyId,
-            InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body, Class<T> refType) {
+            InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body, Class<T> refType,
+            List<String> pathVariables) {
         log.info("Sending outflow request to platform for country code: {} and party id: {}", toOcpiCountryCode,
                 toOcpiPartyId);
         try {
             HttpHeaders headers = createHeaders(toOcpiCountryCode, toOcpiPartyId);
             String platformEndpoint = getOutflowUrl(tenantId, moduleID, interfaceRole);
+
+            // Build URL with path variables
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(platformEndpoint);
+            if (pathVariables != null && !pathVariables.isEmpty()) {
+                for (String pathVariable : pathVariables) {
+                    uriBuilder.pathSegment(pathVariable);
+                }
+            }
+            String finalUrl = uriBuilder.encode().toUriString();
+
             HttpEntity<N> entity = new HttpEntity<>(body, headers);
             ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef = GenericTypeRefUtil.getWrapperTypeRef(refType);
             ResponseEntity<OcpiResponse<T>> response = restTemplate.exchange(
-                    platformEndpoint,
+                    finalUrl,
                     method,
                     entity,
                     responseTypeRef);
@@ -101,7 +114,8 @@ public class PlatformClient {
             log.error("Tenant ID: {} | {}", tenantId, msg);
             throw new OCPICustomException(msg);
         } catch (Exception ex) {
-            log.error("Tenant ID: {} | Error while retrieving or updating OCN version details from platform, error message: {}",
+            log.error(
+                    "Tenant ID: {} | Error while retrieving or updating OCN version details from platform, error message: {}",
                     tenantId, ex.getLocalizedMessage());
             throw new OCPICustomException("Error while retrieving or updating OCN version details from platform");
         }
