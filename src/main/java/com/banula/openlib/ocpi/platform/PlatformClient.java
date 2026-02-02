@@ -65,6 +65,41 @@ public class PlatformClient {
         }
     }
 
+    public <T, N> OcpiResponse<T> sendOutflowRequest(String tenantId, String toOcpiCountryCode, String toOcpiPartyId,
+            InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body,
+            ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef, List<String> pathVariables,
+            java.util.Map<String, String> queryParams) {
+        log.info("Sending outflow request to platform for country code: {} and party id: {}", toOcpiCountryCode,
+                toOcpiPartyId);
+        try {
+            HttpHeaders headers = createHeaders(toOcpiCountryCode, toOcpiPartyId);
+            String platformEndpoint = getOutflowUrl(tenantId, moduleID, interfaceRole);
+
+            // Build URL with path variables and query params
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(platformEndpoint);
+            if (pathVariables != null && !pathVariables.isEmpty()) {
+                for (String pathVariable : pathVariables) {
+                    uriBuilder.pathSegment(pathVariable);
+                }
+            }
+            if (queryParams != null && !queryParams.isEmpty()) {
+                queryParams.forEach(uriBuilder::queryParam);
+            }
+            String finalUrl = uriBuilder.encode().toUriString();
+
+            HttpEntity<N> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<OcpiResponse<T>> response = restTemplate.exchange(
+                    finalUrl,
+                    method,
+                    entity,
+                    responseTypeRef);
+            return response.getBody();
+        } catch (Exception ex) {
+            log.error("Error while sending outflow request to platform, error message: {}", ex.getLocalizedMessage());
+            throw new OCPICustomException("Error while sending outflow request to platform");
+        }
+    }
+
     public void updateOcnVersionDetailsFromPlatform(String tenantId) {
         try {
             log.info("Updating OCN version details from platform | Tenant ID: {} | Platform URL: {}",
