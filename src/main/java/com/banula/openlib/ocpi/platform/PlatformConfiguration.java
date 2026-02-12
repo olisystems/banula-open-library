@@ -11,4 +11,6 @@ public interface PlatformConfiguration {
 
     void setOcnVersionDetails(String tenantId, OcnVersionDetails ocnVersionDetails);
 
+    boolean isToLogCurlCommands();
+
 }
