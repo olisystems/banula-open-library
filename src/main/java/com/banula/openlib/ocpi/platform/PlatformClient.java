@@ -81,7 +81,11 @@ public class PlatformClient {
                 InfoUtils.logCurlCommand(finalUrl, method, headers, requestBody);
             }
             ResponseEntity<OcpiResponse<T>> response = restTemplate.exchange(finalUrl, method, entity, responseTypeRef);
-            return response.getBody();
+            OcpiResponse<T> responseBody = response.getBody();
+            if (responseBody != null) {
+                responseBody.setHeaders(response.getHeaders());
+            }
+            return responseBody;
         } catch (Exception ex) {
             log.error("Error while sending outflow request to platform, error message: {}", ex.getLocalizedMessage());
             throw new OCPICustomException("Error while sending outflow request to platform");
