@@ -19,6 +19,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.HandlerMapping;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Resolves method parameters annotated with {@link PlatformRequest} into
@@ -28,6 +29,8 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class PlatformHeadersResolver implements HandlerMethodArgumentResolver {
+
+  private static final Pattern TENANT_PATTERN = Pattern.compile("^[A-Z]{2}_[A-Z]{3}$");
 
   private final ApplicationContext applicationContext;
 
@@ -69,12 +72,27 @@ public class PlatformHeadersResolver implements HandlerMethodArgumentResolver {
       throw new MissingPlatformHeaderException(annotation.tenantPath(), "tenant");
     }
 
-    // Validate platform request if validation component exists
+    // Validate tenant format and platform request
     if (tenant != null) {
+      validateTenantFormat(tenant);
       validatePlatformRequest(tenant);
     }
 
     return new PlatformRequestValues(tenant);
+  }
+
+  /**
+   * Validates tenant format to ensure it matches the pattern XX_YYY
+   * (2 uppercase letters, underscore, 3 uppercase letters).
+   * 
+   * @param tenant the tenant identifier to validate
+   * @throws IllegalArgumentException if tenant format is invalid
+   */
+  private void validateTenantFormat(String tenant) {
+    if (!TENANT_PATTERN.matcher(tenant).matches()) {
+      throw new IllegalArgumentException(
+          String.format("Invalid tenant format: '%s'. Expected format: XX_YYY (e.g., DE_ABC)", tenant));
+    }
   }
 
   /**
