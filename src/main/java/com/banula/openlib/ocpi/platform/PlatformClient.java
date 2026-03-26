@@ -1,16 +1,18 @@
 package com.banula.openlib.ocpi.platform;
 
+import org.springframework.http.HttpHeaders;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.banula.openlib.ocn.client.GenericTypeRefUtil;
 import com.banula.openlib.ocn.model.OcnVersionDetails;
@@ -19,6 +21,12 @@ import com.banula.openlib.ocpi.model.OcpiResponse;
 import com.banula.openlib.ocpi.model.enums.InterfaceRole;
 import com.banula.openlib.ocpi.model.enums.ModuleID;
 import com.banula.openlib.ocpi.model.vo.Endpoint;
+import com.banula.openlib.ocpi.util.InfoUtils;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,28 +36,73 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class PlatformClient {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.findAndRegisterModules();
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    }
+
     private final RestTemplate restTemplate;
     private final PlatformConfiguration platformConfiguration;
 
     public <T, N> OcpiResponse<T> sendOutflowRequest(String tenantId, String toOcpiCountryCode, String toOcpiPartyId,
-            InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body, Class<T> refType) {
+            InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body, Class<T> refType,
+            List<String> pathVariables) {
+        ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef = GenericTypeRefUtil.getWrapperTypeRef(refType);
+        return sendOutflowRequest(tenantId, toOcpiCountryCode, toOcpiPartyId, interfaceRole, moduleID, method, body,
+                responseTypeRef, pathVariables, null);
+    }
+
+    public <T, N> OcpiResponse<T> sendOutflowRequest(String tenantId, String toOcpiCountryCode, String toOcpiPartyId,
+            InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body,
+            ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef, List<String> pathVariables,
+            java.util.Map<String, String> queryParams) {
+        return executeOutflowRequest(tenantId, toOcpiCountryCode, toOcpiPartyId, interfaceRole, moduleID, method, body,
+                responseTypeRef, pathVariables, queryParams);
+    }
+
+    private <T, N> OcpiResponse<T> executeOutflowRequest(String tenantId, String toOcpiCountryCode,
+            String toOcpiPartyId, InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body,
+            ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef, List<String> pathVariables,
+            java.util.Map<String, String> queryParams) {
         log.info("Sending outflow request to platform for country code: {} and party id: {}", toOcpiCountryCode,
                 toOcpiPartyId);
         try {
             HttpHeaders headers = createHeaders(toOcpiCountryCode, toOcpiPartyId);
             String platformEndpoint = getOutflowUrl(tenantId, moduleID, interfaceRole);
+            String finalUrl = buildUrl(platformEndpoint, pathVariables, queryParams);
             HttpEntity<N> entity = new HttpEntity<>(body, headers);
-            ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef = GenericTypeRefUtil.getWrapperTypeRef(refType);
-            ResponseEntity<OcpiResponse<T>> response = restTemplate.exchange(
-                    platformEndpoint,
-                    method,
-                    entity,
-                    responseTypeRef);
-            return response.getBody();
+            if (platformConfiguration.isToLogCurlCommands()) {
+                String requestBody = body != null ? objectMapper.writeValueAsString(body) : null;
+                InfoUtils.logCurlCommand(finalUrl, method, headers, requestBody);
+            }
+            ResponseEntity<OcpiResponse<T>> response = restTemplate.exchange(finalUrl, method, entity, responseTypeRef);
+            OcpiResponse<T> responseBody = response.getBody();
+            if (responseBody != null) {
+                responseBody.setHeaders(response.getHeaders());
+            }
+            return responseBody;
         } catch (Exception ex) {
             log.error("Error while sending outflow request to platform, error message: {}", ex.getLocalizedMessage());
             throw new OCPICustomException("Error while sending outflow request to platform");
         }
+    }
+
+    private String buildUrl(String baseUrl, List<String> pathVariables, java.util.Map<String, String> queryParams) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(baseUrl);
+        if (pathVariables != null && !pathVariables.isEmpty()) {
+            for (String pathVariable : pathVariables) {
+                uriBuilder.pathSegment(pathVariable);
+            }
+        }
+        if (queryParams != null && !queryParams.isEmpty()) {
+            queryParams.forEach(uriBuilder::queryParam);
+        }
+        return uriBuilder.encode().toUriString();
     }
 
     public void updateOcnVersionDetailsFromPlatform(String tenantId) {
@@ -101,7 +154,8 @@ public class PlatformClient {
             log.error("Tenant ID: {} | {}", tenantId, msg);
             throw new OCPICustomException(msg);
         } catch (Exception ex) {
-            log.error("Tenant ID: {} | Error while retrieving or updating OCN version details from platform, error message: {}",
+            log.error(
+                    "Tenant ID: {} | Error while retrieving or updating OCN version details from platform, error message: {}",
                     tenantId, ex.getLocalizedMessage());
             throw new OCPICustomException("Error while retrieving or updating OCN version details from platform");
         }
@@ -143,8 +197,9 @@ public class PlatformClient {
                 .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
         String url = endpoint.getUrl();
         int startIndex = url.indexOf("ocpi/");
-        String endpointUrl = url.substring(startIndex + 5); // +5 to skip "ocpi/"
-        return platformConfiguration.getPlatformUrl() + "/" + tenantId + "/ocpi/proxy/outflow/" + endpointUrl;
+        String endpointUrl = url.substring(startIndex);
+        return platformConfiguration.getPlatformUrl() + "/api/v1/internal/" + tenantId + "/outflow/"
+                + endpointUrl;
 
     }
 

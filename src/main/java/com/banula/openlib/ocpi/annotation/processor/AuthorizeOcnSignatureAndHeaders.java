@@ -1,12 +1,7 @@
 package com.banula.openlib.ocpi.annotation.processor;
 
-import com.banula.openlib.ocn.Notary;
-import com.banula.openlib.ocn.client.OcnClient;
-import com.banula.openlib.ocpi.exception.OCPICustomException;
-import com.banula.openlib.ocpi.util.Constants;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static com.banula.openlib.ocpi.annotation.processor.AuthorizeHeaders.authorizeRequestHeaders;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,7 +9,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static com.banula.openlib.ocpi.annotation.processor.AuthorizeHeaders.authorizeRequestHeaders;
+import com.banula.openlib.ocn.Notary;
+import com.banula.openlib.ocn.client.OcnClient;
+import com.banula.openlib.ocpi.exception.OCPICustomException;
+import com.banula.openlib.ocpi.util.Constants;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is responsible for authorizing the OCN signature and headers. This
@@ -25,10 +26,7 @@ import static com.banula.openlib.ocpi.annotation.processor.AuthorizeHeaders.auth
 @Slf4j
 @Aspect
 @Component
-@AllArgsConstructor
 public class AuthorizeOcnSignatureAndHeaders {
-
-    private final OcnClient ocnClient;
 
     @Around("@annotation(com.banula.openlib.ocpi.annotation.AuthorizeOcnSignatureAndHeaders)")
     public Object processAuthorizationHeader(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -38,7 +36,7 @@ public class AuthorizeOcnSignatureAndHeaders {
         String countryCode = request.getHeader("OCPI-to-country-code");
         String partyId = request.getHeader("OCPI-to-party-id");
 
-        if (ocnClient.getConfiguration().isSigningSupported()) {
+        if (OcnClient.configuration.isSigningSupported()) {
             String ocnSignature = request.getHeader("OCN-Signature");
             if (ocnSignature == null) {
                 log.error("OCN Signature is missing.");
@@ -54,7 +52,7 @@ public class AuthorizeOcnSignatureAndHeaders {
             }
         }
 
-        authorizeRequestHeaders(tokenB, partyId, countryCode, ocnClient);
+        authorizeRequestHeaders(tokenB, partyId, countryCode, OcnClient.configuration);
         return joinPoint.proceed();
     }
 

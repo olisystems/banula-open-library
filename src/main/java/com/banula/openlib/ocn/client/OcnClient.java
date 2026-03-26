@@ -1,36 +1,38 @@
 package com.banula.openlib.ocn.client;
 
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+
+import org.apache.hc.client5.http.classic.HttpClient;
+import com.banula.openlib.ocpi.model.enums.Role;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.banula.openlib.ocn.Notary;
 import com.banula.openlib.ocn.model.*;
 import com.banula.openlib.ocpi.model.OcpiErrorResponse;
 import com.banula.openlib.ocpi.model.OcpiResponse;
 import com.banula.openlib.ocpi.model.dto.CredentialsDTO;
-import com.banula.openlib.ocpi.model.enums.Role;
 import com.banula.openlib.ocpi.model.vo.BusinessDetails;
 import com.banula.openlib.ocpi.model.vo.CredentialsRole;
 import com.banula.openlib.ocpi.model.vo.Endpoint;
 import com.banula.openlib.ocpi.util.InfoUtils;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import org.apache.hc.client5.http.classic.HttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.springframework.http.*;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class OcnClient {
@@ -40,7 +42,7 @@ public class OcnClient {
     private RestTemplate restTemplate;
     private OcnVersionDetailsHandler ocnVersionDetailsHandler;
 
-    static OcnClientConfiguration configuration;
+    public static OcnClientConfiguration configuration;
 
     static {
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);

@@ -1,5 +1,6 @@
 package com.banula.openlib.ocpi.util;
 
+import com.banula.openlib.ocpi.custom.smartlocations.SmartLocation;
 import com.banula.openlib.ocpi.model.ChargingSession;
 import com.banula.openlib.ocpi.model.Location;
 import com.banula.openlib.ocpi.model.Token;
@@ -81,7 +82,20 @@ public class ModelPatcherUtil {
             }
             field.setAccessible(false);
         }
+    }
 
+    public static void smartLocationPatcher(SmartLocation existingLocation, SmartLocation incompleteLocation)
+            throws IllegalAccessException {
+        Class<?> internClass = SmartLocation.class;
+        Field[] internFields = internClass.getDeclaredFields();
+        for (Field field : internFields) {
+            field.setAccessible(true);
+            Object value = field.get(incompleteLocation);
+            if (value != null) {
+                field.set(existingLocation, value);
+            }
+            field.setAccessible(false);
+        }
     }
 
 }
