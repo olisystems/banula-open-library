@@ -8,6 +8,7 @@ import com.banula.openlib.ocpi.model.vo.Connector;
 import com.banula.openlib.ocpi.model.vo.EVSE;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /*
   This model patcher methods iterates through every field of the incomplete dto request and uses the filled-in fields
@@ -16,86 +17,54 @@ import java.lang.reflect.Field;
 
 public class ModelPatcherUtil {
 
-    public static void tokenPatcher(Token existingToken, Token incompleteToken) throws IllegalAccessException {
-        Class<?> internClass = Token.class;
-        Field[] internFields = internClass.getDeclaredFields();
-        for (Field field : internFields) {
+    private static void patchObjectFields(Object existingObject, Object incompleteObject, Class<?> type)
+            throws IllegalAccessException {
+        if (type == null || type == Object.class) {
+            return;
+        }
+
+        for (Field field : type.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+
             field.setAccessible(true);
-            Object value = field.get(incompleteToken);
+            Object value = field.get(incompleteObject);
             if (value != null) {
-                field.set(existingToken, value);
+                field.set(existingObject, value);
             }
             field.setAccessible(false);
         }
+
+        patchObjectFields(existingObject, incompleteObject, type.getSuperclass());
+    }
+
+    public static void tokenPatcher(Token existingToken, Token incompleteToken) throws IllegalAccessException {
+        patchObjectFields(existingToken, incompleteToken, Token.class);
     }
 
     public static void locationPatcher(Location existingLocation, Location incompleteLocation)
             throws IllegalAccessException {
-        Class<?> internClass = Location.class;
-        Field[] internFields = internClass.getDeclaredFields();
-        for (Field field : internFields) {
-            field.setAccessible(true);
-            Object value = field.get(incompleteLocation);
-            if (value != null) {
-                field.set(existingLocation, value);
-            }
-            field.setAccessible(false);
-        }
+        patchObjectFields(existingLocation, incompleteLocation, Location.class);
     }
 
     public static void evsePatcher(EVSE existingEvse, EVSE incompleteEvse) throws IllegalAccessException {
-        Class<?> internClass = EVSE.class;
-        Field[] internFields = internClass.getDeclaredFields();
-        for (Field field : internFields) {
-            field.setAccessible(true);
-            Object value = field.get(incompleteEvse);
-            if (value != null) {
-                field.set(existingEvse, value);
-            }
-            field.setAccessible(false);
-        }
+        patchObjectFields(existingEvse, incompleteEvse, EVSE.class);
     }
 
     public static void connectorPatcher(Connector existingConnector, Connector incompleteConnector)
             throws IllegalAccessException {
-        Class<?> internClass = Connector.class;
-        Field[] internFields = internClass.getDeclaredFields();
-        for (Field field : internFields) {
-            field.setAccessible(true);
-            Object value = field.get(incompleteConnector);
-            if (value != null) {
-                field.set(existingConnector, value);
-            }
-            field.setAccessible(false);
-        }
+        patchObjectFields(existingConnector, incompleteConnector, Connector.class);
     }
 
     public static void sessionPatcher(ChargingSession existingSession, ChargingSession incompleteSession)
             throws IllegalAccessException {
-        Class<?> internClass = ChargingSession.class;
-        Field[] internFields = internClass.getDeclaredFields();
-        for (Field field : internFields) {
-            field.setAccessible(true);
-            Object value = field.get(incompleteSession);
-            if (value != null) {
-                field.set(existingSession, value);
-            }
-            field.setAccessible(false);
-        }
+        patchObjectFields(existingSession, incompleteSession, ChargingSession.class);
     }
 
     public static void smartLocationPatcher(SmartLocation existingLocation, SmartLocation incompleteLocation)
             throws IllegalAccessException {
-        Class<?> internClass = SmartLocation.class;
-        Field[] internFields = internClass.getDeclaredFields();
-        for (Field field : internFields) {
-            field.setAccessible(true);
-            Object value = field.get(incompleteLocation);
-            if (value != null) {
-                field.set(existingLocation, value);
-            }
-            field.setAccessible(false);
-        }
+        patchObjectFields(existingLocation, incompleteLocation, SmartLocation.class);
     }
 
 }
