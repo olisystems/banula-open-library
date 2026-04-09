@@ -9,6 +9,8 @@ import com.banula.openlib.ocpi.model.vo.EVSE;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 /*
   This model patcher methods iterates through every field of the incomplete dto request and uses the filled-in fields
@@ -17,54 +19,92 @@ import java.lang.reflect.Modifier;
 
 public class ModelPatcherUtil {
 
-    private static void patchObjectFields(Object existingObject, Object incompleteObject, Class<?> type)
+    private static boolean patchObjectFields(Object existingObject, Object incompleteObject, Class<?> type)
             throws IllegalAccessException {
         if (type == null || type == Object.class) {
-            return;
+            return false;
         }
 
+        boolean changed = false;
         for (Field field : type.getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers())) {
+            if (Modifier.isStatic(field.getModifiers()) || field.getName().equals("lastUpdated")) {
                 continue;
             }
 
             field.setAccessible(true);
             Object value = field.get(incompleteObject);
             if (value != null) {
-                field.set(existingObject, value);
+                Object existingValue = field.get(existingObject);
+                if (!Objects.equals(value, existingValue)) {
+                    field.set(existingObject, value);
+                    changed = true;
+                }
             }
             field.setAccessible(false);
         }
 
-        patchObjectFields(existingObject, incompleteObject, type.getSuperclass());
+        return changed | patchObjectFields(existingObject, incompleteObject, type.getSuperclass());
     }
 
     public static void tokenPatcher(Token existingToken, Token incompleteToken) throws IllegalAccessException {
-        patchObjectFields(existingToken, incompleteToken, Token.class);
+        if (patchObjectFields(existingToken, incompleteToken, Token.class)) {
+            existingToken.setLastUpdated(LocalDateTime.now());
+        }
     }
 
     public static void locationPatcher(Location existingLocation, Location incompleteLocation)
             throws IllegalAccessException {
-        patchObjectFields(existingLocation, incompleteLocation, Location.class);
+        if (patchObjectFields(existingLocation, incompleteLocation, Location.class)) {
+            existingLocation.setLastUpdated(LocalDateTime.now());
+        }
     }
 
     public static void evsePatcher(EVSE existingEvse, EVSE incompleteEvse) throws IllegalAccessException {
-        patchObjectFields(existingEvse, incompleteEvse, EVSE.class);
+        evsePatcher(null, existingEvse, incompleteEvse);
+    }
+
+    public static void evsePatcher(Location location, EVSE existingEvse, EVSE incompleteEvse)
+            throws IllegalAccessException {
+        if (patchObjectFields(existingEvse, incompleteEvse, EVSE.class)) {
+            LocalDateTime now = LocalDateTime.now();
+            existingEvse.setLastUpdated(now);
+            if (location != null) {
+                location.setLastUpdated(now);
+            }
+        }
     }
 
     public static void connectorPatcher(Connector existingConnector, Connector incompleteConnector)
             throws IllegalAccessException {
-        patchObjectFields(existingConnector, incompleteConnector, Connector.class);
+        connectorPatcher(null, null, existingConnector, incompleteConnector);
+    }
+
+    public static void connectorPatcher(Location location, EVSE evse, Connector existingConnector,
+            Connector incompleteConnector) throws IllegalAccessException {
+        if (patchObjectFields(existingConnector, incompleteConnector, Connector.class)) {
+            LocalDateTime now = LocalDateTime.now();
+            existingConnector.setLastUpdated(now);
+            if (evse != null) {
+                evse.setLastUpdated(now);
+            }
+            if (location != null) {
+                location.setLastUpdated(now);
+            }
+        }
     }
 
     public static void sessionPatcher(ChargingSession existingSession, ChargingSession incompleteSession)
             throws IllegalAccessException {
-        patchObjectFields(existingSession, incompleteSession, ChargingSession.class);
+        if (patchObjectFields(existingSession, incompleteSession, ChargingSession.class)) {
+            existingSession.setLastUpdated(LocalDateTime.now());
+        }
     }
 
     public static void smartLocationPatcher(SmartLocation existingLocation, SmartLocation incompleteLocation)
             throws IllegalAccessException {
-        patchObjectFields(existingLocation, incompleteLocation, SmartLocation.class);
+        if (patchObjectFields(existingLocation, incompleteLocation, SmartLocation.class)) {
+            existingLocation.setLastUpdated(LocalDateTime.now());
+        }
     }
 
 }
