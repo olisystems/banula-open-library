@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpHeaders;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Data
 @AllArgsConstructor
@@ -34,7 +35,7 @@ public class OcpiResponse<T> {
         this.data = data;
         this.status_code = statusCode;
         this.status_message = statusMessage;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
 
         try {
             this.ocn_signature = OcnClient.signResponse(this);
@@ -47,7 +48,7 @@ public class OcpiResponse<T> {
         this.data = data;
         this.status_code = 1000;
         this.status_message = "";
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
 
         try {
             this.ocn_signature = OcnClient.signResponse(this);

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +49,8 @@ public class GenericMongoMapper {
                 }
             }
 
-            // Optionally set lastUpdated if field exists
-            setFieldIfExists(mongoEntity, "lastUpdated", LocalDateTime.now());
+            // Optionally set lastUpdated if field exists (always use UTC time)
+            setFieldIfExists(mongoEntity, "lastUpdated", LocalDateTime.now(ZoneOffset.UTC));
 
             return mongoEntity;
         } catch (Exception e) {

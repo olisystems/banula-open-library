@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -22,9 +23,12 @@ public class OCPILocalDateTimeDeserializer extends JsonDeserializer<LocalDateTim
         String raw = p.getText().trim();
 
         // Try with offset (e.g., "Z" or "+00:00")
+        // Convert to UTC zone to ensure OCPI timestamps are always interpreted as UTC
         try {
             OffsetDateTime odt = OffsetDateTime.parse(raw, OFFSET_FORMATTER);
-            return odt.toLocalDateTime();
+            LocalDateTime result = odt.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+            log.debug("Deserialized OCPI timestamp: {} -> {} (UTC)", raw, result);
+            return result;
         } catch (DateTimeParseException ignored) {
         }
 

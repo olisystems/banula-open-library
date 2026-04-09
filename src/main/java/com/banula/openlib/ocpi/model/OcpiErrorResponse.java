@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Data
 @AllArgsConstructor
@@ -30,7 +31,7 @@ public class OcpiErrorResponse {
         this.status_code = Constants.STATUS_CODE_GENERIC_SERVER_ERROR; // by default, we keep this OCPI error code,
                                                                        // which means internal server error.
         this.status_message = errorMessage;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
 
         try {
             this.ocn_signature = OcnClient.signErrorResponse(this);
@@ -42,7 +43,7 @@ public class OcpiErrorResponse {
     public OcpiErrorResponse(String errorMessage, int statusCode) {
         this.status_code = statusCode;
         this.status_message = errorMessage;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
         try {
             this.ocn_signature = OcnClient.signErrorResponse(this);
         } catch (Exception ex) {
