@@ -10,6 +10,7 @@ import com.banula.openlib.ocpi.model.vo.EVSE;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Objects;
 
 /*
@@ -48,14 +49,14 @@ public class ModelPatcherUtil {
 
     public static void tokenPatcher(Token existingToken, Token incompleteToken) throws IllegalAccessException {
         if (patchObjectFields(existingToken, incompleteToken, Token.class)) {
-            existingToken.setLastUpdated(LocalDateTime.now());
+            existingToken.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         }
     }
 
     public static void locationPatcher(Location existingLocation, Location incompleteLocation)
             throws IllegalAccessException {
         if (patchObjectFields(existingLocation, incompleteLocation, Location.class)) {
-            existingLocation.setLastUpdated(LocalDateTime.now());
+            existingLocation.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         }
     }
 
@@ -66,7 +67,7 @@ public class ModelPatcherUtil {
     public static void evsePatcher(Location location, EVSE existingEvse, EVSE incompleteEvse)
             throws IllegalAccessException {
         if (patchObjectFields(existingEvse, incompleteEvse, EVSE.class)) {
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
             existingEvse.setLastUpdated(now);
             if (location != null) {
                 location.setLastUpdated(now);
@@ -82,7 +83,7 @@ public class ModelPatcherUtil {
     public static void connectorPatcher(Location location, EVSE evse, Connector existingConnector,
             Connector incompleteConnector) throws IllegalAccessException {
         if (patchObjectFields(existingConnector, incompleteConnector, Connector.class)) {
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
             existingConnector.setLastUpdated(now);
             if (evse != null) {
                 evse.setLastUpdated(now);
@@ -96,14 +97,14 @@ public class ModelPatcherUtil {
     public static void sessionPatcher(ChargingSession existingSession, ChargingSession incompleteSession)
             throws IllegalAccessException {
         if (patchObjectFields(existingSession, incompleteSession, ChargingSession.class)) {
-            existingSession.setLastUpdated(LocalDateTime.now());
+            existingSession.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         }
     }
 
     public static void smartLocationPatcher(SmartLocation existingLocation, SmartLocation incompleteLocation)
             throws IllegalAccessException {
         if (patchObjectFields(existingLocation, incompleteLocation, SmartLocation.class)) {
-            existingLocation.setLastUpdated(LocalDateTime.now());
+            existingLocation.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         }
     }
 
