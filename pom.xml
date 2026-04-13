@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.my-oli</groupId>
     <artifactId>banula-open-library</artifactId>
-    <version>0.1.27</version>
+    <version>0.1.28</version>
     <packaging>jar</packaging>
 
     <name>banula-open-library</name>
@@ -180,6 +180,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.3.1</version>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
