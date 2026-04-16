@@ -186,24 +186,29 @@ public class GenericMongoMapper {
 
     private <M> M findExistingDocument(M mongoEntity, Class<M> mongoClass, List<String> businessKeyFields) {
         Query query = buildBusinessKeyQuery(mongoEntity, businessKeyFields);
+        if (query == null) {
+            return null;
+        }
         return mongoTemplate.findOne(query, mongoClass);
     }
 
     private Query buildBusinessKeyQuery(Object mongoEntity, List<String> businessKeyFields) {
+        if (businessKeyFields == null || businessKeyFields.isEmpty()) {
+            return null;
+        }
+
         Criteria criteria = new Criteria();
         List<Criteria> criteriaList = new ArrayList<>();
 
         for (String fieldName : businessKeyFields) {
             Object fieldValue = getFieldIfExists(mongoEntity, fieldName);
-            if (fieldValue != null) {
-                criteriaList.add(Criteria.where(fieldName).is(fieldValue));
+            if (fieldValue == null) {
+                return null;
             }
+            criteriaList.add(Criteria.where(fieldName).is(fieldValue));
         }
 
-        if (!criteriaList.isEmpty()) {
-            criteria.andOperator(criteriaList.toArray(new Criteria[0]));
-        }
-
+        criteria.andOperator(criteriaList.toArray(new Criteria[0]));
         return new Query(criteria);
     }
 
