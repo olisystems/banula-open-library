@@ -1,8 +1,10 @@
 package com.banula.openlib.mongodb.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
@@ -25,6 +27,7 @@ import org.springframework.core.convert.converter.Converter;
  * timestamp handling across the platform.
  */
 @Configuration
+@ConditionalOnClass(MongoTemplate.class)
 public class MongoConfig {
 
     @Bean

@@ -3,11 +3,11 @@ package com.banula.openlib.ocpi.util;
 import com.banula.openlib.ocpi.model.Location;
 import com.banula.openlib.ocpi.model.vo.Connector;
 import com.banula.openlib.ocpi.model.vo.EVSE;
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
-import java.util.List;
 
-@Slf4j
+import java.util.List;
+import java.util.Objects;
+
 public class LocationUtility {
 
     @Nullable
@@ -16,7 +16,7 @@ public class LocationUtility {
             return null;
         }
         return evse.getConnectors().stream()
-                .filter(connectorIteration -> connectorIteration.getId().equals(connectorId))
+                .filter(connectorIteration -> Objects.equals(connectorIteration.getId(), connectorId))
                 .findFirst()
                 .orElse(null);
     }
@@ -27,14 +27,14 @@ public class LocationUtility {
             return null;
         }
         return location.getEvses().stream()
-                .filter(evseIteration -> evseIteration.getUid().equals(evseUid))
+                .filter(evseIteration -> Objects.equals(evseIteration.getUid(), evseUid))
                 .findFirst()
                 .orElse(null);
     }
 
     public static int evseIndexOf(List<EVSE> evses, EVSE evse) {
         for (int i = 0; i < evses.size(); i++) {
-            if (evses.get(i).getUid().equals(evse.getUid())) {
+            if (Objects.equals(evses.get(i).getUid(), evse.getUid())) {
                 return i;
             }
         }
@@ -43,7 +43,7 @@ public class LocationUtility {
 
     public static int connectorIndexOf(List<Connector> connectors, Connector connector) {
         for (int i = 0; i < connectors.size(); i++) {
-            if (connectors.get(i).getId().equals(connector.getId())) {
+            if (Objects.equals(connectors.get(i).getId(), connector.getId())) {
                 return i;
             }
         }
