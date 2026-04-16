@@ -21,7 +21,6 @@ public class OcnClientConfiguration {
     private String adminKey;
     private List<Role> ocpiRoles;
     private String partyBackendUrl;
-    private boolean updatingParty;
     private String integrationTestParameter;
     private boolean logCurlCommand;
 }

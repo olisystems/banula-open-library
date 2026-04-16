@@ -52,11 +52,6 @@ public class OcnClientBuilder {
         return this;
     }
 
-    public OcnClientBuilder setUpdatePartyOnStart(boolean updateOnStart) {
-        this.configuration.setUpdatingParty(updateOnStart);
-        return this;
-    }
-
     public OcnClientBuilder setOcpiRoles(List<Role> roles) {
         this.configuration.setOcpiRoles(roles);
         return this;

@@ -3,6 +3,7 @@ package com.banula.openlib.ocn.client;
 public enum OcnEndpoints {
     // Registration
     GENERATE_REGISTRATION_TOKEN("/admin/generate-registration-token"),
+    DELETE_PARTY_CREDENTIALS("/admin/party"),
     REGISTER_PARTY_CREDENTIALS("/ocpi/2.2.1/credentials"),
 
     // CUSTOM MODULES
