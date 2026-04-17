@@ -44,7 +44,8 @@ public class ModelPatcherUtil {
             field.setAccessible(false);
         }
 
-        return changed | patchObjectFields(existingObject, incompleteObject, type.getSuperclass());
+        boolean superChanged = patchObjectFields(existingObject, incompleteObject, type.getSuperclass());
+        return changed || superChanged;
     }
 
     public static void tokenPatcher(Token existingToken, Token incompleteToken) throws IllegalAccessException {
