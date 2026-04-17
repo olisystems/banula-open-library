@@ -105,7 +105,6 @@ public class OcnClient {
 
         } catch (Exception ex) {
             log.error(String.format("OCN party registration error: %s", ex.getLocalizedMessage()));
-            ex.printStackTrace();
         }
     }
 

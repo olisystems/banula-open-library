@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@ConditionalOnClass(MongoTemplate.class)
 public class GenericMongoMapper {
 
     @Autowired
