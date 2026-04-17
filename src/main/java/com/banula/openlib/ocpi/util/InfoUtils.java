@@ -40,12 +40,16 @@ public class InfoUtils {
         StringBuilder curlCommand = new StringBuilder();
         curlCommand.append("curl -X ").append(httpMethod.name());
 
-        // Add all headers
+        // Add all headers (excluding content-length as curl calculates it
+        // automatically)
         if (headers != null) {
             headers.forEach((headerName, headerValues) -> {
-                for (String headerValue : headerValues) {
-                    curlCommand.append(" -H '").append(headerName).append(": ").append(escapeSingleQuotes(headerValue))
-                            .append("'");
+                if (!"content-length".equalsIgnoreCase(headerName)) {
+                    for (String headerValue : headerValues) {
+                        curlCommand.append(" -H '").append(headerName).append(": ")
+                                .append(escapeSingleQuotes(headerValue))
+                                .append("'");
+                    }
                 }
             });
         }

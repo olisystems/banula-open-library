@@ -2,6 +2,7 @@ package com.banula.openlib.ocpi.custom.smartlocations.dto;
 
 import com.banula.openlib.ocpi.custom.smartlocations.DefaultSupplier;
 import com.banula.openlib.ocpi.custom.smartlocations.MeteringDataSource;
+import com.banula.openlib.ocpi.custom.smartlocations.SmartLocationState;
 import com.banula.openlib.ocpi.custom.smartlocations.validations.SmartLocationCreateGroup;
 import com.banula.openlib.ocpi.model.dto.LocationDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -59,4 +60,7 @@ public class SmartLocationDTO extends LocationDTO {
     @JsonProperty("default_supplier")
     @NotNull(message = "Default supplier cannot be null", groups = SmartLocationCreateGroup.class)
     private DefaultSupplier defaultSupplier;
+
+    @JsonProperty("smart_location_state")
+    private SmartLocationState smartLocationState;
 }

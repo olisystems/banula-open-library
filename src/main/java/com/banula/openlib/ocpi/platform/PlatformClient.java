@@ -23,6 +23,7 @@ import com.banula.openlib.ocpi.model.enums.ModuleID;
 import com.banula.openlib.ocpi.model.vo.Endpoint;
 import com.banula.openlib.ocpi.util.InfoUtils;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -44,6 +45,7 @@ public class PlatformClient {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.findAndRegisterModules();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     private final RestTemplate restTemplate;

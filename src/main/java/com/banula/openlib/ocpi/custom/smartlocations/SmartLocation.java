@@ -52,4 +52,7 @@ public class SmartLocation extends Location {
     @JsonProperty("default_supplier")
     @NotNull(message = "Default supplier cannot be null")
     private DefaultSupplier defaultSupplier;
+
+    @JsonProperty("smart_location_state")
+    private SmartLocationState smartLocationState;
 }
