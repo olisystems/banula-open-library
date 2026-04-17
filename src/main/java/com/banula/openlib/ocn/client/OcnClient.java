@@ -572,6 +572,10 @@ public class OcnClient {
                     new ArrayList<>(),
                     null);
 
+            if (response == null || response.getData() == null) {
+                log.warn("Could not retrieve credentials: empty response or missing data");
+                return null;
+            }
             return response.getData();
         } catch (Exception e) {
             log.warn("Could not retrieve credentials: " + e.getMessage());
