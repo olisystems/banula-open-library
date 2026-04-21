@@ -9,8 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
  * party ID, and ID lookup.
  * This interface can be extended by any MongoRepository to add the standard
  * OCPI query method.
- * Spring Data MongoDB will automatically implement this method based on the
- * naming convention.
+ * The query method is implemented via an explicit {@code @Query} annotation.
  * 
  * @param <T> The entity type
  */
@@ -21,7 +20,7 @@ public interface OcpiCommonCompoundIndex<T> {
      * id).
      * This is the standard OCPI pattern used across CPO, EMSP, and other OCPI
      * modules.
-     * Spring Data will automatically generate the query implementation.
+     * The query is defined explicitly via {@code @Query} with positional parameters.
      * 
      * @param countryCode The country code (e.g., "DE", "NL")
      * @param partyId     The party identifier (e.g., "BAN", "ABC")

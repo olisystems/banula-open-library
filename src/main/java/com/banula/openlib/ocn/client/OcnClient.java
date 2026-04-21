@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
 import org.apache.hc.client5.http.classic.HttpClient;
 import com.banula.openlib.ocpi.model.enums.Role;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -70,25 +69,30 @@ public class OcnClient {
                 configuration.getFromCountryCode(), configuration.getFromPartyId(), configuration.getPartyBackendUrl());
         log.info("Initiating communication with the ocn-node: {}", configuration.getNodeUrl());
         OcnCredential credential = ocnCredentialHandler.getOcnCredential();
-        boolean isToUpdateParty = configuration.isUpdatingParty();
         try {
             String generatedTokenC = null;
-            // if no token C is found, register party and save in database
-            if (credential == null || credential.getTokenC() == null || credential.getTokenC().isBlank()) {
-                log.info("Token C not found, registering party...");
-                generatedTokenC = this.registerParty(configuration.getPartyBackendUrl(), configuration.getOcpiRoles());
-            } else {
-                // if token C is found, update party in case of isToUpdateParty = true, and save
-                // in database
-                if (isToUpdateParty) {
-                    log.info("Updating party credentials...");
+
+            // If TokenC exists, try GET credentials and then update via PUT
+            if (credential != null && credential.getTokenC() != null && !credential.getTokenC().isBlank()) {
+                log.info("Token C found, verifying credentials on OCN Node...");
+                CredentialsDTO currentCredentials = this.getCredentials(credential.getTokenC());
+
+                if (currentCredentials != null) {
+                    log.info("Party is already registered in OCN Node, updating credentials...");
                     generatedTokenC = this.updateParty(configuration.getPartyBackendUrl(),
                             configuration.getOcpiRoles());
                 } else {
-                    generatedTokenC = credential.getTokenC();
-                    log.info("Token C found, skipping party registration");
+                    log.warn("Failed to get credentials from OCN Node | Proceeding with fresh registration...");
                 }
             }
+
+            // If no TokenC or GET failed, delete and register anew
+            if (generatedTokenC == null) {
+                log.info("Performing fresh registration...");
+                this.deleteCredentials();
+                generatedTokenC = this.registerParty(configuration.getPartyBackendUrl(), configuration.getOcpiRoles());
+            }
+
             verifyAndSetGeneratedTokenC(generatedTokenC);
             OcnVersionDetails endpointResponse = this.getVersionDetails();
 
@@ -101,9 +105,6 @@ public class OcnClient {
 
         } catch (Exception ex) {
             log.error(String.format("OCN party registration error: %s", ex.getLocalizedMessage()));
-            for (StackTraceElement ste : ex.getStackTrace()) {
-                System.out.println(ste);
-            }
         }
     }
 
@@ -529,6 +530,57 @@ public class OcnClient {
         }
 
         return "";
+    }
+
+    public String deleteCredentials() {
+        try {
+            String url = String.format("%s%s/%s/%s", configuration.getNodeUrl(),
+                    OcnEndpoints.DELETE_PARTY_CREDENTIALS.toString(),
+                    configuration.getFromCountryCode(), configuration.getFromPartyId());
+
+            String base64AdminKey = Base64.getEncoder().encodeToString(configuration.getAdminKey().getBytes());
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Token " + base64AdminKey);
+
+            ParameterizedTypeReference<String> responseType = new ParameterizedTypeReference<String>() {
+            };
+
+            return this._call(url, null, new HashMap<>(), headers, responseType, HttpMethod.DELETE, new ArrayList<>(),
+                    null);
+        } catch (Exception ex) {
+            log.error("Error while deleting credentials on OCN Node: " + ex.getMessage());
+            return null;
+        }
+    }
+
+    private CredentialsDTO getCredentials(String tokenC) {
+        try {
+            String base64TokenC = Base64.getEncoder().encodeToString(tokenC.getBytes());
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Token " + base64TokenC);
+
+            ParameterizedTypeReference<OcpiResponse<CredentialsDTO>> responseType = new ParameterizedTypeReference<OcpiResponse<CredentialsDTO>>() {
+            };
+
+            OcpiResponse<CredentialsDTO> response = this._call(
+                    OcnEndpoints.REGISTER_PARTY_CREDENTIALS,
+                    null,
+                    new HashMap<>(),
+                    headers,
+                    responseType,
+                    HttpMethod.GET,
+                    new ArrayList<>(),
+                    null);
+
+            if (response == null || response.getData() == null) {
+                log.warn("Could not retrieve credentials: empty response or missing data");
+                return null;
+            }
+            return response.getData();
+        } catch (Exception e) {
+            log.warn("Could not retrieve credentials: " + e.getMessage());
+            return null;
+        }
     }
 
     private String getRegistrationToken() throws Exception {
