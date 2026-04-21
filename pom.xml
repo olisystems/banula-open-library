@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.my-oli</groupId>
     <artifactId>banula-open-library</artifactId>
-    <version>0.1.29</version>
+    <version>0.1.30-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>banula-open-library</name>
@@ -242,6 +242,29 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-no-snapshots</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireReleaseVersion>
+                                    <message>SNAPSHOT versions are not allowed to be deployed!</message>
+                                </requireReleaseVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
