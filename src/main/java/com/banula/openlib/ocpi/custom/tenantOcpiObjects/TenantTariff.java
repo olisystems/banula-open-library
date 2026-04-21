@@ -1,8 +1,6 @@
 package com.banula.openlib.ocpi.custom.tenantOcpiObjects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.banula.openlib.ocpi.model.Location;
-import jakarta.validation.constraints.NotEmpty;
+import com.banula.openlib.ocpi.model.Tariff;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,8 +12,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class TenantLocation extends Location {
-    @JsonProperty("tenant")
-    @NotEmpty(message = "Tenant cannot be empty")
+public class TenantTariff extends Tariff {
     private String tenant;
 }
