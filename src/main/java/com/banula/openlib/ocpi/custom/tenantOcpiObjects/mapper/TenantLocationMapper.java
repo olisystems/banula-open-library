@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 
+// TODO: verify this could also be removed to use GenericMongoMapper instead
 public class TenantLocationMapper {
 
     public static TenantLocation toTenantLocationEntity(TenantLocationDTO tenantLocationDTO) {

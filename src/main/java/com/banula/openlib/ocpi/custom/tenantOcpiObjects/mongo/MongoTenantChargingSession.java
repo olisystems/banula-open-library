@@ -1,8 +1,7 @@
 package com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo;
 
-import com.banula.openlib.mongodb.interfaces.HasMongoOcpiCompositeId;
 import com.banula.openlib.mongodb.interfaces.HasMongoTenantOcpiCompositeId;
-import com.banula.openlib.ocpi.custom.tenantOcpiObjects.TenantTariff;
+import com.banula.openlib.ocpi.custom.tenantOcpiObjects.TenantChargingSession;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,9 +14,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-@Document("#{@MongoCollectionMapper.getTariffCollectionName()}")
-@CompoundIndex(name = "unique_tariff", def = "{'countryCode': 1, 'partyId': 1, 'id': 1, 'tenant': 1}", unique = true)
-public class MongoTenantTariff extends TenantTariff implements HasMongoTenantOcpiCompositeId {
+@Document("#{@MongoCollectionMapper.getChargingSessionCollectionName()}")
+@CompoundIndex(name = "unique_charging_session", def = "{'countryCode': 1, 'partyId': 1, 'id': 1, 'tenant': 1}", unique = true)
+public class MongoTenantChargingSession extends TenantChargingSession implements HasMongoTenantOcpiCompositeId {
 
     @Id
     private String mongoId;

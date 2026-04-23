@@ -1,6 +1,5 @@
 package com.banula.openlib.ocpi.custom.tenantOcpiObjects.dto;
 
-import com.banula.openlib.ocpi.custom.tenantOcpiObjects.validations.TenantLocationCreateGroup;
 import com.banula.openlib.ocpi.model.dto.LocationDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,7 +16,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 public class TenantLocationDTO extends LocationDTO {
-    @JsonProperty("tenant_id")
-    @NotEmpty(message = "Tenant ID cannot be empty", groups = TenantLocationCreateGroup.class)
-    private String tenantId;
+    @JsonProperty("tenant")
+    private String tenant;
 }

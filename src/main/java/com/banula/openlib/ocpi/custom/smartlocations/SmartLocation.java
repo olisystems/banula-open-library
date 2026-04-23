@@ -1,6 +1,7 @@
 package com.banula.openlib.ocpi.custom.smartlocations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.banula.openlib.mongodb.interfaces.HasMongoOcpiCompositeId;
 import com.banula.openlib.ocpi.model.Location;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

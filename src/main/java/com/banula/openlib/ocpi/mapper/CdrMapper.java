@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO: verify it could be removed updating usage by GenericMongoMapper
 @Mapper(componentModel = "spring")
 public interface CdrMapper {
 

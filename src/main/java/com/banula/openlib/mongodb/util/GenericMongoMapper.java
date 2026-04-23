@@ -1,5 +1,8 @@
 package com.banula.openlib.mongodb.util;
 
+import com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo.*;
+import com.banula.openlib.ocpi.model.*;
+import com.banula.openlib.ocpi.model.dto.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.BeanUtils;
@@ -29,7 +32,7 @@ public class GenericMongoMapper {
     public <T, M> M toMongo(T entity, Class<M> mongoClass) {
         try {
             M mongoEntity = mongoClass.getDeclaredConstructor().newInstance();
-            BeanUtils.copyProperties(entity, mongoEntity);
+            CustomBeanUtils.copyProperties(entity, mongoEntity);
 
             // Get compound index annotation
             CompoundIndex compoundIndex = getCompoundIndexAnnotation(mongoClass);
@@ -58,7 +61,7 @@ public class GenericMongoMapper {
     public <T, M> T toEntity(M mongoEntity, Class<T> entityClass) {
         try {
             T entity = entityClass.getDeclaredConstructor().newInstance();
-            BeanUtils.copyProperties(mongoEntity, entity);
+            CustomBeanUtils.copyProperties(mongoEntity, entity);
             return entity;
         } catch (Exception e) {
             throw new RuntimeException("Error converting mongo entity to entity: " + e.getMessage(), e);
@@ -68,7 +71,7 @@ public class GenericMongoMapper {
     public <T, D> D toDTO(T entity, Class<D> dtoClass) {
         try {
             D dto = dtoClass.getDeclaredConstructor().newInstance();
-            BeanUtils.copyProperties(entity, dto);
+            CustomBeanUtils.copyProperties(entity, dto);
             return dto;
         } catch (Exception e) {
             throw new RuntimeException("Error converting entity to DTO: " + e.getMessage(), e);
@@ -78,7 +81,7 @@ public class GenericMongoMapper {
     public <T, D> T fromDTO(D dto, Class<T> entityClass) {
         try {
             T entity = entityClass.getDeclaredConstructor().newInstance();
-            BeanUtils.copyProperties(dto, entity);
+            CustomBeanUtils.copyProperties(dto, entity);
             return entity;
         } catch (Exception e) {
             throw new RuntimeException("Error converting DTO to entity: " + e.getMessage(), e);
@@ -145,8 +148,101 @@ public class GenericMongoMapper {
         return mongoEntities;
     }
 
-    // Internal helper methods
+    // especific model methods that use the ones above behind the scenes
 
+    public <T> CdrDTO cdrToDTO(T entity) {
+        return toDTO(entity, CdrDTO.class);
+    }
+
+    public <T> MongoTenantCDR cdrToMongo(T entity) {
+        return toMongo(entity, MongoTenantCDR.class);
+    }
+
+    public <D> MongoTenantCDR cdrDtoToMongo(D dto, String tenant) {
+        MongoTenantCDR mongo = dtoToMongo(dto, CDR.class, MongoTenantCDR.class);
+        mongo.setTenant(tenant);
+        return mongo;
+    }
+
+    public <T> LocationDTO locationToDTO(T entity) {
+        return toDTO(entity, LocationDTO.class);
+    }
+
+    public <T> MongoTenantLocation locationToMongo(T entity) {
+        return toMongo(entity, MongoTenantLocation.class);
+    }
+
+    public <D> MongoTenantLocation locationDtoToMongo(D dto, String tenant) {
+        MongoTenantLocation mongo = dtoToMongo(dto, Location.class, MongoTenantLocation.class);
+        mongo.setTenant(tenant);
+        return mongo;
+    }
+
+    public <T> TariffDTO tariffToDTO(T entity) {
+        return toDTO(entity, TariffDTO.class);
+    }
+
+    public <T> MongoTenantTariff tariffToMongo(T entity) {
+        return toMongo(entity, MongoTenantTariff.class);
+    }
+
+    public <D> MongoTenantTariff tariffDtoToMongo(D dto, String tenant) {
+        MongoTenantTariff mongo = dtoToMongo(dto, Tariff.class, MongoTenantTariff.class);
+        mongo.setTenant(tenant);
+        return mongo;
+    }
+
+    public <T> TokenDTO tokenToDTO(T entity) {
+        return toDTO(entity, TokenDTO.class);
+    }
+
+    public <T> MongoTenantToken tokenToMongo(T entity) {
+        return toMongo(entity, MongoTenantToken.class);
+    }
+
+    public <D> MongoTenantToken tokenDtoToMongo(D dto, String tenant) {
+        MongoTenantToken mongo = dtoToMongo(dto, Token.class, MongoTenantToken.class);
+        mongo.setTenant(tenant);
+        return mongo;
+    }
+
+    public <T> ChargingSessionDTO sessionToDTO(T entity) {
+        return toDTO(entity, ChargingSessionDTO.class);
+    }
+
+    public <T> MongoTenantChargingSession sessionToMongo(T entity) {
+        return toMongo(entity, MongoTenantChargingSession.class);
+    }
+
+    public <D> MongoTenantChargingSession sessionDtoToMongo(D dto, String tenant) {
+        MongoTenantChargingSession mongo = dtoToMongo(dto, ChargingSession.class, MongoTenantChargingSession.class);
+        mongo.setTenant(tenant);
+        return mongo;
+    }
+
+    // List variants for specific models
+
+    public <T> List<CdrDTO> cdrListToDTOList(List<T> entities) {
+        return toDTOList(entities, CdrDTO.class);
+    }
+
+    public <T> List<LocationDTO> locationListToDTOList(List<T> entities) {
+        return toDTOList(entities, LocationDTO.class);
+    }
+
+    public <T> List<TariffDTO> tariffListToDTOList(List<T> entities) {
+        return toDTOList(entities, TariffDTO.class);
+    }
+
+    public <T> List<TokenDTO> tokenListToDTOList(List<T> entities) {
+        return toDTOList(entities, TokenDTO.class);
+    }
+
+    public <T> List<ChargingSessionDTO> sessionListToDTOList(List<T> entities) {
+        return toDTOList(entities, ChargingSessionDTO.class);
+    }
+
+    // Internal helper methods
     private CompoundIndex getCompoundIndexAnnotation(Class<?> mongoClass) {
         CompoundIndex annotation = mongoClass.getAnnotation(CompoundIndex.class);
         if (annotation == null) {

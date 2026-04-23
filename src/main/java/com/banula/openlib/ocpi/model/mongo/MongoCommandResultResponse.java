@@ -1,7 +1,7 @@
 package com.banula.openlib.ocpi.model.mongo;
 
 import com.banula.openlib.mongodb.interfaces.HasMongoOcpiCompositeId;
-import com.banula.openlib.ocpi.model.CDR;
+import com.banula.openlib.ocpi.model.vo.CommandResultResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -14,14 +14,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor(force = true)
-@Document("#{@MongoCollectionMapper.getCdrCollectionName()}")
-@CompoundIndex(name = "unique_cdr", def = "{'countryCode': 1, 'partyId': 1, 'id': 1}", unique = true)
-public class MongoCDR extends CDR implements HasMongoOcpiCompositeId {
+@Document("#{@MongoCollectionMapper.getCommandResultResponseCollectionName()}")
+@CompoundIndex(name = "unique_command_result", def = "{'countryCode': 1, 'partyId': 1, 'uid': 1}", unique = true)
+public class MongoCommandResultResponse extends CommandResultResponse {
 
     @Id
     private String mongoId;
 
-    public String getOcpiId() {
-        return getId();
-    }
 }

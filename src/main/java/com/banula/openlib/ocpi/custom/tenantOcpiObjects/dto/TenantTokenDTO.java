@@ -1,9 +1,7 @@
-package com.banula.openlib.ocpi.custom.tenantOcpiObjects;
+package com.banula.openlib.ocpi.custom.tenantOcpiObjects.dto;
 
-import com.banula.openlib.ocpi.model.Tariff;
+import com.banula.openlib.ocpi.model.dto.TokenDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,8 +13,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class TenantTariff extends Tariff {
+public class TenantTokenDTO extends TokenDTO {
     @JsonProperty("tenant")
-    @NotEmpty(message = "Tenant cannot be empty")
     private String tenant;
 }

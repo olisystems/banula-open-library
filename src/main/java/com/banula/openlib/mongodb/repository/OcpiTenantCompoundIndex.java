@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.repository.Query;
  * 
  * @param <T> The entity type
  */
-public interface OcpiCommonCompoundIndex<T> {
+public interface OcpiTenantCompoundIndex<T> {
 
     /**
      * Find an OCPI entity by its compound business key (countryCode + partyId +
@@ -23,11 +23,12 @@ public interface OcpiCommonCompoundIndex<T> {
      * The query is defined explicitly via {@code @Query} with positional
      * parameters.
      * 
+     * @param tenant      The tenant id (e.g. "DE_ABC")
      * @param countryCode The country code (e.g., "DE", "NL")
      * @param partyId     The party identifier (e.g., "BAN", "ABC")
      * @param id          The entity's unique ID within the party's scope
      * @return Optional containing the found entity or empty if not found
      */
-    @Query("{countryCode: ?0, partyId: ?1, id: ?2}")
-    Optional<T> findByCompoundIndex(String countryCode, String partyId, String id);
+    @Query("{tenant: ?0, countryCode: ?1, partyId: ?2, id: ?3}")
+    Optional<T> findByCompoundIndex(String tenant, String countryCode, String partyId, String id);
 }

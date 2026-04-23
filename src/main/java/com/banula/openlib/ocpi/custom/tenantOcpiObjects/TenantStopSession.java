@@ -1,8 +1,7 @@
 package com.banula.openlib.ocpi.custom.tenantOcpiObjects;
 
-import com.banula.openlib.ocpi.model.Tariff;
+import com.banula.openlib.ocpi.model.StopSession;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class TenantTariff extends Tariff {
+public class TenantStopSession extends StopSession {
     @JsonProperty("tenant")
     @NotEmpty(message = "Tenant cannot be empty")
     private String tenant;
