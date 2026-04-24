@@ -161,6 +161,7 @@ public class GenericMongoMapper {
     public <D> MongoTenantCDR cdrDtoToMongo(D dto, String tenant) {
         MongoTenantCDR mongo = dtoToMongo(dto, CDR.class, MongoTenantCDR.class);
         mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
@@ -175,6 +176,7 @@ public class GenericMongoMapper {
     public <D> MongoTenantLocation locationDtoToMongo(D dto, String tenant) {
         MongoTenantLocation mongo = dtoToMongo(dto, Location.class, MongoTenantLocation.class);
         mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
@@ -189,6 +191,7 @@ public class GenericMongoMapper {
     public <D> MongoTenantTariff tariffDtoToMongo(D dto, String tenant) {
         MongoTenantTariff mongo = dtoToMongo(dto, Tariff.class, MongoTenantTariff.class);
         mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
@@ -203,6 +206,7 @@ public class GenericMongoMapper {
     public <D> MongoTenantToken tokenDtoToMongo(D dto, String tenant) {
         MongoTenantToken mongo = dtoToMongo(dto, Token.class, MongoTenantToken.class);
         mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
@@ -217,6 +221,7 @@ public class GenericMongoMapper {
     public <D> MongoTenantChargingSession sessionDtoToMongo(D dto, String tenant) {
         MongoTenantChargingSession mongo = dtoToMongo(dto, ChargingSession.class, MongoTenantChargingSession.class);
         mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
