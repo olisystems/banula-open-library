@@ -3,6 +3,11 @@ package com.banula.openlib.mongodb.util;
 import com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo.*;
 import com.banula.openlib.ocpi.model.*;
 import com.banula.openlib.ocpi.model.dto.*;
+import com.banula.openlib.ocpi.model.mongo.MongoCDR;
+import com.banula.openlib.ocpi.model.mongo.MongoChargingSession;
+import com.banula.openlib.ocpi.model.mongo.MongoLocation;
+import com.banula.openlib.ocpi.model.mongo.MongoTariff;
+import com.banula.openlib.ocpi.model.mongo.MongoToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.BeanUtils;
@@ -154,12 +159,26 @@ public class GenericMongoMapper {
         return toDTO(entity, CdrDTO.class);
     }
 
-    public <T> MongoTenantCDR cdrToMongo(T entity) {
-        return toMongo(entity, MongoTenantCDR.class);
+    public <T> MongoCDR cdrToMongo(T entity) {
+        return toMongo(entity, MongoCDR.class);
     }
 
-    public <D> MongoTenantCDR cdrDtoToMongo(D dto, String tenant) {
+    public <D> MongoCDR cdrDtoToMongo(D dto) {
+        MongoCDR mongo = dtoToMongo(dto, CDR.class, MongoCDR.class);
+
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantCDR cdrDtoToMongoTenant(D dto, String tenant) {
         MongoTenantCDR mongo = dtoToMongo(dto, CDR.class, MongoTenantCDR.class);
+        mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantCDR cdrToMongoTenant(D entity, String tenant) {
+        MongoTenantCDR mongo = toMongo(entity, MongoTenantCDR.class);
         mongo.setTenant(tenant);
         CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;
@@ -169,12 +188,26 @@ public class GenericMongoMapper {
         return toDTO(entity, LocationDTO.class);
     }
 
-    public <T> MongoTenantLocation locationToMongo(T entity) {
-        return toMongo(entity, MongoTenantLocation.class);
+    public <T> MongoLocation locationToMongo(T entity) {
+        return toMongo(entity, MongoLocation.class);
     }
 
-    public <D> MongoTenantLocation locationDtoToMongo(D dto, String tenant) {
+    public <D> MongoLocation locationDtoToMongo(D dto) {
+        MongoLocation mongo = dtoToMongo(dto, Location.class, MongoLocation.class);
+
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantLocation locationDtoToMongoTenant(D dto, String tenant) {
         MongoTenantLocation mongo = dtoToMongo(dto, Location.class, MongoTenantLocation.class);
+        mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantLocation locationToMongoTenant(D entity, String tenant) {
+        MongoTenantLocation mongo = toMongo(entity, MongoTenantLocation.class);
         mongo.setTenant(tenant);
         CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;
@@ -184,12 +217,26 @@ public class GenericMongoMapper {
         return toDTO(entity, TariffDTO.class);
     }
 
-    public <T> MongoTenantTariff tariffToMongo(T entity) {
-        return toMongo(entity, MongoTenantTariff.class);
+    public <T> MongoTariff tariffToMongo(T entity) {
+        return toMongo(entity, MongoTariff.class);
     }
 
-    public <D> MongoTenantTariff tariffDtoToMongo(D dto, String tenant) {
+    public <D> MongoTariff tariffDtoToMongo(D dto) {
+        MongoTariff mongo = dtoToMongo(dto, Tariff.class, MongoTariff.class);
+
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantTariff tariffDtoToMongoTenant(D dto, String tenant) {
         MongoTenantTariff mongo = dtoToMongo(dto, Tariff.class, MongoTenantTariff.class);
+        mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantTariff tariffToMongoTenant(D entity, String tenant) {
+        MongoTenantTariff mongo = toMongo(entity, MongoTenantTariff.class);
         mongo.setTenant(tenant);
         CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;
@@ -199,12 +246,26 @@ public class GenericMongoMapper {
         return toDTO(entity, TokenDTO.class);
     }
 
-    public <T> MongoTenantToken tokenToMongo(T entity) {
-        return toMongo(entity, MongoTenantToken.class);
+    public <T> MongoToken tokenToMongo(T entity) {
+        return toMongo(entity, MongoToken.class);
     }
 
-    public <D> MongoTenantToken tokenDtoToMongo(D dto, String tenant) {
+    public <D> MongoToken tokenDtoToMongo(D dto) {
+        MongoToken mongo = dtoToMongo(dto, Token.class, MongoToken.class);
+
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantToken tokenDtoToMongoTenant(D dto, String tenant) {
         MongoTenantToken mongo = dtoToMongo(dto, Token.class, MongoTenantToken.class);
+        mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantToken tokenToMongoTenant(D entity, String tenant) {
+        MongoTenantToken mongo = toMongo(entity, MongoTenantToken.class);
         mongo.setTenant(tenant);
         CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;
@@ -214,12 +275,26 @@ public class GenericMongoMapper {
         return toDTO(entity, ChargingSessionDTO.class);
     }
 
-    public <T> MongoTenantChargingSession sessionToMongo(T entity) {
-        return toMongo(entity, MongoTenantChargingSession.class);
+    public <T> MongoChargingSession sessionToMongo(T entity) {
+        return toMongo(entity, MongoChargingSession.class);
     }
 
-    public <D> MongoTenantChargingSession sessionDtoToMongo(D dto, String tenant) {
+    public <D> MongoChargingSession sessionDtoToMongo(D dto) {
+        MongoChargingSession mongo = dtoToMongo(dto, ChargingSession.class, MongoChargingSession.class);
+
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantChargingSession sessionDtoToMongoTenant(D dto, String tenant) {
         MongoTenantChargingSession mongo = dtoToMongo(dto, ChargingSession.class, MongoTenantChargingSession.class);
+        mongo.setTenant(tenant);
+        CustomBeanUtils.finalizeMongoId(mongo);
+        return mongo;
+    }
+
+    public <D> MongoTenantChargingSession sessionToMongoTenant(D entity, String tenant) {
+        MongoTenantChargingSession mongo = toMongo(entity, MongoTenantChargingSession.class);
         mongo.setTenant(tenant);
         CustomBeanUtils.finalizeMongoId(mongo);
         return mongo;

@@ -47,6 +47,18 @@ public class CustomBeanUtils {
                 entity.getPartyId(), entity.getOcpiId()));
     }
 
+    public static void finalizeMongoId(HasMongoOcpiCompositeId entity) {
+        if (entity.getCountryCode() == null ||
+                entity.getPartyId() == null || entity.getOcpiId() == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Missing fields for OCPI Composite ID: countryCode=%s, partyId=%s, id=%s",
+                    entity.getCountryCode(), entity.getPartyId(), entity.getOcpiId()));
+        }
+        entity.setMongoId(String.format("%s*%s*%s",
+                entity.getCountryCode(),
+                entity.getPartyId(), entity.getOcpiId()));
+    }
+
     private static void handleOcpiCompositeId(HasMongoOcpiCompositeId entity) {
         if (entity.getCountryCode() == null || entity.getPartyId() == null || entity.getOcpiId() == null) {
             throw new IllegalArgumentException(String.format(
