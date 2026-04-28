@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.banula.openlib.ocpi.model.enums.Facility;
 import com.banula.openlib.ocpi.model.enums.ParkingType;
 import com.banula.openlib.ocpi.model.vo.*;
+import com.banula.openlib.ocpi.util.GeoLocationDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
 import jakarta.validation.Valid;
@@ -135,6 +136,7 @@ public class Location {
      * Coordinates of the location.
      */
     @JsonProperty("coordinates")
+    @JsonDeserialize(using = GeoLocationDeserializer.class)
     @NotNull(message = "Coordinates cannot be null")
     @Valid
     private GeoLocation coordinates;

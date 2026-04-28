@@ -28,8 +28,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LocationDTO {
 
-    private static final Set<String> ISO_ALPHA3 =
-            Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA3);
+    private static final Set<String> ISO_ALPHA3 = Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA3);
 
     @NotEmpty(message = "Country code must not be blank")
     @Size(min = 1, max = 2, message = "Country code must be between 1 and 2 characters")
@@ -69,10 +68,8 @@ public class LocationDTO {
     @Size(min = 1, max = 20, message = "State must be between 1 and 20 characters")
     private String state;
 
-
     @NotNull
-    @Pattern(regexp = "^[A-Z]{3}$",
-            message = "country must be 3 upper-case letters (ISO 3166-1 alpha-3)")
+    @Pattern(regexp = "^[A-Z]{3}$", message = "country must be 3 upper-case letters (ISO 3166-1 alpha-3)")
     private String country;
 
     // in case of future queying by this field using newsphere requests (mongodb) it
@@ -87,7 +84,7 @@ public class LocationDTO {
     @JsonProperty("parking_type")
     private ParkingType parkingType;
 
-    private List<EVSE> evses;
+    private List<EvseDTO> evses;
 
     private List<DisplayText> directions;
 

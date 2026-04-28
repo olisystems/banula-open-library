@@ -5,7 +5,7 @@ import org.springframework.beans.BeanUtils;
 import com.banula.openlib.mongodb.interfaces.HasMongoOcpiCompositeId;
 import com.banula.openlib.mongodb.interfaces.HasMongoTenantOcpiCompositeId;
 
-public class CustomBeanUtils {
+public class MongoBeanUtils {
 
     public static void copyProperties(Object origin, Object destination) {
         BeanUtils.copyProperties(origin, destination);

@@ -1,8 +1,8 @@
 package com.banula.openlib.mongodb.util;
 
 import com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo.*;
+import com.banula.openlib.ocpi.mapper.GenericMapper;
 import com.banula.openlib.ocpi.model.*;
-import com.banula.openlib.ocpi.model.dto.*;
 import com.banula.openlib.ocpi.model.mongo.MongoCDR;
 import com.banula.openlib.ocpi.model.mongo.MongoChargingSession;
 import com.banula.openlib.ocpi.model.mongo.MongoLocation;
@@ -10,7 +10,6 @@ import com.banula.openlib.ocpi.model.mongo.MongoTariff;
 import com.banula.openlib.ocpi.model.mongo.MongoToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,18 +25,18 @@ import java.util.Map;
 
 @ConditionalOnClass(MongoTemplate.class)
 @Component
-public class GenericMongoMapper {
+public class GenericMongoMapper extends GenericMapper {
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Core conversions with smart upsert
+    // Core mongo conversions with smart upsert
     public <T, M> M toMongo(T entity, Class<M> mongoClass) {
         try {
             M mongoEntity = mongoClass.getDeclaredConstructor().newInstance();
-            CustomBeanUtils.copyProperties(entity, mongoEntity);
+            MongoBeanUtils.copyProperties(entity, mongoEntity);
 
             // Get compound index annotation
             CompoundIndex compoundIndex = getCompoundIndexAnnotation(mongoClass);
@@ -66,34 +65,14 @@ public class GenericMongoMapper {
     public <T, M> T toEntity(M mongoEntity, Class<T> entityClass) {
         try {
             T entity = entityClass.getDeclaredConstructor().newInstance();
-            CustomBeanUtils.copyProperties(mongoEntity, entity);
+            MongoBeanUtils.copyProperties(mongoEntity, entity);
             return entity;
         } catch (Exception e) {
             throw new RuntimeException("Error converting mongo entity to entity: " + e.getMessage(), e);
         }
     }
 
-    public <T, D> D toDTO(T entity, Class<D> dtoClass) {
-        try {
-            D dto = dtoClass.getDeclaredConstructor().newInstance();
-            CustomBeanUtils.copyProperties(entity, dto);
-            return dto;
-        } catch (Exception e) {
-            throw new RuntimeException("Error converting entity to DTO: " + e.getMessage(), e);
-        }
-    }
-
-    public <T, D> T fromDTO(D dto, Class<T> entityClass) {
-        try {
-            T entity = entityClass.getDeclaredConstructor().newInstance();
-            CustomBeanUtils.copyProperties(dto, entity);
-            return entity;
-        } catch (Exception e) {
-            throw new RuntimeException("Error converting DTO to entity: " + e.getMessage(), e);
-        }
-    }
-
-    // Composite conversions
+    // Composite mongo conversions
     public <M, D, T> D mongoToDTO(M mongoEntity, Class<T> entityClass, Class<D> dtoClass) {
         T entity = toEntity(mongoEntity, entityClass);
         return toDTO(entity, dtoClass);
@@ -104,7 +83,7 @@ public class GenericMongoMapper {
         return toMongo(entity, mongoClass);
     }
 
-    // List variants
+    // Mongo list variants
     public <T, M> List<M> toMongoList(List<T> entities, Class<M> mongoClass) {
         List<M> mongoEntities = new ArrayList<>();
         for (T entity : entities) {
@@ -117,22 +96,6 @@ public class GenericMongoMapper {
         List<T> entities = new ArrayList<>();
         for (M mongoEntity : mongoEntities) {
             entities.add(toEntity(mongoEntity, entityClass));
-        }
-        return entities;
-    }
-
-    public <T, D> List<D> toDTOList(List<T> entities, Class<D> dtoClass) {
-        List<D> dtos = new ArrayList<>();
-        for (T entity : entities) {
-            dtos.add(toDTO(entity, dtoClass));
-        }
-        return dtos;
-    }
-
-    public <T, D> List<T> fromDTOList(List<D> dtos, Class<T> entityClass) {
-        List<T> entities = new ArrayList<>();
-        for (D dto : dtos) {
-            entities.add(fromDTO(dto, entityClass));
         }
         return entities;
     }
@@ -153,11 +116,7 @@ public class GenericMongoMapper {
         return mongoEntities;
     }
 
-    // especific model methods that use the ones above behind the scenes
-
-    public <T> CdrDTO cdrToDTO(T entity) {
-        return toDTO(entity, CdrDTO.class);
-    }
+    // Specific model mongo methods
 
     public <T> MongoCDR cdrToMongo(T entity) {
         return toMongo(entity, MongoCDR.class);
@@ -165,27 +124,22 @@ public class GenericMongoMapper {
 
     public <D> MongoCDR cdrDtoToMongo(D dto) {
         MongoCDR mongo = dtoToMongo(dto, CDR.class, MongoCDR.class);
-
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantCDR cdrDtoToMongoTenant(D dto, String tenant) {
         MongoTenantCDR mongo = dtoToMongo(dto, CDR.class, MongoTenantCDR.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantCDR cdrToMongoTenant(D entity, String tenant) {
         MongoTenantCDR mongo = toMongo(entity, MongoTenantCDR.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
-    }
-
-    public <T> LocationDTO locationToDTO(T entity) {
-        return toDTO(entity, LocationDTO.class);
     }
 
     public <T> MongoLocation locationToMongo(T entity) {
@@ -194,27 +148,22 @@ public class GenericMongoMapper {
 
     public <D> MongoLocation locationDtoToMongo(D dto) {
         MongoLocation mongo = dtoToMongo(dto, Location.class, MongoLocation.class);
-
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantLocation locationDtoToMongoTenant(D dto, String tenant) {
         MongoTenantLocation mongo = dtoToMongo(dto, Location.class, MongoTenantLocation.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantLocation locationToMongoTenant(D entity, String tenant) {
         MongoTenantLocation mongo = toMongo(entity, MongoTenantLocation.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
-    }
-
-    public <T> TariffDTO tariffToDTO(T entity) {
-        return toDTO(entity, TariffDTO.class);
     }
 
     public <T> MongoTariff tariffToMongo(T entity) {
@@ -223,27 +172,22 @@ public class GenericMongoMapper {
 
     public <D> MongoTariff tariffDtoToMongo(D dto) {
         MongoTariff mongo = dtoToMongo(dto, Tariff.class, MongoTariff.class);
-
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantTariff tariffDtoToMongoTenant(D dto, String tenant) {
         MongoTenantTariff mongo = dtoToMongo(dto, Tariff.class, MongoTenantTariff.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantTariff tariffToMongoTenant(D entity, String tenant) {
         MongoTenantTariff mongo = toMongo(entity, MongoTenantTariff.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
-    }
-
-    public <T> TokenDTO tokenToDTO(T entity) {
-        return toDTO(entity, TokenDTO.class);
     }
 
     public <T> MongoToken tokenToMongo(T entity) {
@@ -252,27 +196,22 @@ public class GenericMongoMapper {
 
     public <D> MongoToken tokenDtoToMongo(D dto) {
         MongoToken mongo = dtoToMongo(dto, Token.class, MongoToken.class);
-
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantToken tokenDtoToMongoTenant(D dto, String tenant) {
         MongoTenantToken mongo = dtoToMongo(dto, Token.class, MongoTenantToken.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantToken tokenToMongoTenant(D entity, String tenant) {
         MongoTenantToken mongo = toMongo(entity, MongoTenantToken.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
-    }
-
-    public <T> ChargingSessionDTO sessionToDTO(T entity) {
-        return toDTO(entity, ChargingSessionDTO.class);
     }
 
     public <T> MongoChargingSession sessionToMongo(T entity) {
@@ -281,45 +220,22 @@ public class GenericMongoMapper {
 
     public <D> MongoChargingSession sessionDtoToMongo(D dto) {
         MongoChargingSession mongo = dtoToMongo(dto, ChargingSession.class, MongoChargingSession.class);
-
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantChargingSession sessionDtoToMongoTenant(D dto, String tenant) {
         MongoTenantChargingSession mongo = dtoToMongo(dto, ChargingSession.class, MongoTenantChargingSession.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
     }
 
     public <D> MongoTenantChargingSession sessionToMongoTenant(D entity, String tenant) {
         MongoTenantChargingSession mongo = toMongo(entity, MongoTenantChargingSession.class);
         mongo.setTenant(tenant);
-        CustomBeanUtils.finalizeMongoId(mongo);
+        MongoBeanUtils.finalizeMongoId(mongo);
         return mongo;
-    }
-
-    // List variants for specific models
-
-    public <T> List<CdrDTO> cdrListToDTOList(List<T> entities) {
-        return toDTOList(entities, CdrDTO.class);
-    }
-
-    public <T> List<LocationDTO> locationListToDTOList(List<T> entities) {
-        return toDTOList(entities, LocationDTO.class);
-    }
-
-    public <T> List<TariffDTO> tariffListToDTOList(List<T> entities) {
-        return toDTOList(entities, TariffDTO.class);
-    }
-
-    public <T> List<TokenDTO> tokenListToDTOList(List<T> entities) {
-        return toDTOList(entities, TokenDTO.class);
-    }
-
-    public <T> List<ChargingSessionDTO> sessionListToDTOList(List<T> entities) {
-        return toDTOList(entities, ChargingSessionDTO.class);
     }
 
     // Internal helper methods

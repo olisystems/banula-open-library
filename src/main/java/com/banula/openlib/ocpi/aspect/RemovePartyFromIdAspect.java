@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.banula.openlib.ocpi.model.dto.LocationDTO;
 import com.banula.openlib.ocpi.model.dto.TariffDTO;
 import com.banula.openlib.ocpi.model.dto.TokenDTO;
+import com.banula.openlib.ocpi.model.dto.EvseDTO;
 import com.banula.openlib.ocpi.model.vo.EVSE;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,7 @@ public class RemovePartyFromIdAspect {
                     location.setId(removePrefix(location.getId(), prefix));
 
                     if (location.getEvses() != null) {
-                        for (EVSE evse : location.getEvses()) {
+                        for (EvseDTO evse : location.getEvses()) {
                             if (evse.getUid() != null) {
                                 evse.setUid(removePrefix(evse.getUid(), prefix));
                             }
