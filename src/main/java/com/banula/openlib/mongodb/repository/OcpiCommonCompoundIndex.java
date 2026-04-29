@@ -2,6 +2,7 @@ package com.banula.openlib.mongodb.repository;
 
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Query;
 
 /**
@@ -30,4 +31,24 @@ public interface OcpiCommonCompoundIndex<T> {
      */
     @Query("{countryCode: ?0, partyId: ?1, id: ?2}")
     Optional<T> findByCompoundIndex(String countryCode, String partyId, String id);
+
+    @Query("{'_id': ?0}")
+    Optional<T> findByMongoId(String mongoId);
+
+    @Query("{'_id': ?0}")
+    Optional<T> findByObjectId(ObjectId objectId);
+
+    default Optional<T> findByFlexibleId(String id) {
+        if (id != null && id.contains("*")) {
+            String[] parts = id.split("\\*");
+            if (parts.length == 3) {
+                return findByCompoundIndex(parts[0], parts[1], parts[2]);
+            }
+        }
+        Optional<T> result = findByMongoId(id);
+        if (result.isEmpty() && ObjectId.isValid(id)) {
+            return findByObjectId(new ObjectId(id));
+        }
+        return result;
+    }
 }

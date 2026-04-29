@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @NoArgsConstructor(force = true)
 @Document("#{@MongoCollectionMapper.getSmartLocationCollectionName()}")
-@CompoundIndex(name = "unique_location", def = "{'countryCode': 1, 'partyId': 1, 'id': 1}", unique = true)
+@CompoundIndex(name = "unique_smart_location", def = "{'countryCode': 1, 'partyId': 1, 'id': 1}", unique = true)
 public class MongoSmartLocation extends SmartLocation implements HasMongoOcpiCompositeId {
 
     @Id

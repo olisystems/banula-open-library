@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @NoArgsConstructor(force = true)
 @Document("#{@MongoCollectionMapper.getTokenCollectionName()}")
-@CompoundIndex(name = "unique_token", def = "{'countryCode': 1, 'partyId': 1, 'uid': 1}", unique = true)
+@CompoundIndex(name = "unique_token_base", def = "{'countryCode': 1, 'partyId': 1, 'uid': 1}", unique = true)
 public class MongoToken extends Token implements HasMongoOcpiCompositeId {
 
     @Id

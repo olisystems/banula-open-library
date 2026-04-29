@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @NoArgsConstructor
 @Document("#{@MongoCollectionMapper.getLocationCollectionName()}")
-@CompoundIndex(name = "unique_location", def = "{'countryCode': 1, 'partyId': 1, 'id': 1, 'tenant': 1}", unique = true)
+@CompoundIndex(name = "unique_tenant_location", def = "{'countryCode': 1, 'partyId': 1, 'id': 1, 'tenant': 1}", unique = true)
 public class MongoTenantLocation extends TenantLocation implements HasMongoTenantOcpiCompositeId {
 
     @Id

@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @NoArgsConstructor
 @Document("#{@MongoCollectionMapper.getCommandResultResponseCollectionName()}")
-@CompoundIndex(name = "unique_command_result", def = "{'countryCode': 1, 'partyId': 1, 'uid': 1, 'tenant': 1}", unique = true)
+@CompoundIndex(name = "unique_tenant_command_result", def = "{'countryCode': 1, 'partyId': 1, 'uid': 1, 'tenant': 1}", unique = true)
 public class MongoTenantCommandResultResponse extends TenantCommandResultResponse {
 
     @Id

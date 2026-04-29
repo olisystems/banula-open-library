@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @NoArgsConstructor(force = true)
 @Document("#{@MongoCollectionMapper.getTariffCollectionName()}")
-@CompoundIndex(name = "unique_tariff", def = "{'countryCode': 1, 'partyId': 1, 'id': 1}", unique = true)
+@CompoundIndex(name = "unique_tariff_base", def = "{'countryCode': 1, 'partyId': 1, 'id': 1}", unique = true)
 public class MongoTariff extends Tariff implements HasMongoOcpiCompositeId {
 
     @Id

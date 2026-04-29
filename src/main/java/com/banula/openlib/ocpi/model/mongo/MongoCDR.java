@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @NoArgsConstructor(force = true)
 @Document("#{@MongoCollectionMapper.getCdrCollectionName()}")
-@CompoundIndex(name = "unique_cdr", def = "{'countryCode': 1, 'partyId': 1, 'id': 1}", unique = true)
+@CompoundIndex(name = "unique_cdr_base", def = "{'countryCode': 1, 'partyId': 1, 'id': 1}", unique = true)
 public class MongoCDR extends CDR implements HasMongoOcpiCompositeId {
 
     @Id

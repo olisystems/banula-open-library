@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @NoArgsConstructor
 @Document("#{@MongoCollectionMapper.getChargingSessionCollectionName()}")
-@CompoundIndex(name = "unique_charging_session", def = "{'countryCode': 1, 'partyId': 1, 'id': 1, 'tenant': 1}", unique = true)
+@CompoundIndex(name = "unique_tenant_charging_session", def = "{'countryCode': 1, 'partyId': 1, 'id': 1, 'tenant': 1}", unique = true)
 public class MongoTenantChargingSession extends TenantChargingSession implements HasMongoTenantOcpiCompositeId {
 
     @Id
