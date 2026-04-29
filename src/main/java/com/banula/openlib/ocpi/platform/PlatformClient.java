@@ -2,7 +2,12 @@ package com.banula.openlib.ocpi.platform;
 
 import org.springframework.http.HttpHeaders;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -50,6 +55,7 @@ public class PlatformClient {
 
     private final RestTemplate restTemplate;
     private final PlatformConfiguration platformConfiguration;
+    private final Validator validator;
 
     public <T, N> OcpiResponse<T> sendOutflowRequest(String tenantId, String toOcpiCountryCode, String toOcpiPartyId,
             InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body, Class<T> refType,
@@ -63,8 +69,26 @@ public class PlatformClient {
             InterfaceRole interfaceRole, ModuleID moduleID, HttpMethod method, N body,
             ParameterizedTypeReference<OcpiResponse<T>> responseTypeRef, List<String> pathVariables,
             java.util.Map<String, String> queryParams) {
+        validateOcpiCompliance(body, method);
         return executeOutflowRequest(tenantId, toOcpiCountryCode, toOcpiPartyId, interfaceRole, moduleID, method, body,
                 responseTypeRef, pathVariables, queryParams);
+    }
+
+    private <N> void validateOcpiCompliance(N body, HttpMethod method) {
+        if (!HttpMethod.PUT.equals(method)) {
+            return;
+        }
+        if (body == null || !body.getClass().getPackageName().startsWith("com.banula.openlib.ocpi.model.dto")) {
+            throw new OCPICustomException(
+                    "PUT request body must be a valid OCPI DTO from com.banula.openlib.ocpi.model.dto");
+        }
+        Set<ConstraintViolation<N>> violations = validator.validate(body);
+        if (!violations.isEmpty()) {
+            String details = violations.stream()
+                    .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                    .collect(Collectors.joining("; "));
+            throw new OCPICustomException("OCPI object validation failed: " + details);
+        }
     }
 
     private <T, N> OcpiResponse<T> executeOutflowRequest(String tenantId, String toOcpiCountryCode,

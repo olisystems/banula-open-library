@@ -1,6 +1,6 @@
-package com.banula.openlib.ocpi.annotation.processor;
+package com.banula.openlib.ocpi.aspect;
 
-import static com.banula.openlib.ocpi.annotation.processor.AuthorizeHeaders.authorizeRequestHeaders;
+import static com.banula.openlib.ocpi.aspect.AuthorizeHeaders.authorizeRequestHeaders;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

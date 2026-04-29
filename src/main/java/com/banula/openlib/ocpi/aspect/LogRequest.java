@@ -1,4 +1,4 @@
-package com.banula.openlib.ocpi.annotation.processor;
+package com.banula.openlib.ocpi.aspect;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
