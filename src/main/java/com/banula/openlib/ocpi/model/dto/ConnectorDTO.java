@@ -1,22 +1,23 @@
 package com.banula.openlib.ocpi.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.banula.openlib.ocpi.model.enums.ConnectorFormat;
 import com.banula.openlib.ocpi.model.enums.ConnectorType;
 import com.banula.openlib.ocpi.model.enums.PowerType;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -48,11 +49,17 @@ public class ConnectorDTO {
     @JsonProperty("max_amperage")
     private Integer maxAmperage;
 
-    @NotNull(message = "max_electric_power is a required field in Banula style of Charging")
+    // Todo: verify if this could be also a required field in the NSP and accept
+    // Locations with this field empty/null to keep ocpi compliance
+    // @NotNull(message = "max_electric_power is a required field in Banula style of
+    // Charging")
     @JsonProperty("max_electric_power")
     private Integer maxElectricPower;
 
-    @NotNull(message = "tariff_ids is a required field in Banula style of Charging")
+    // Todo: verify if this could be also a required field in the NSP and accept
+    // Locations with this field empty/null to keep ocpi compliance
+    // @NotNull(message = "tariff_ids is a required field in Banula style of
+    // Charging")
     @JsonProperty("tariff_ids")
     private List<@NotEmpty(message = "tariff_id must not be empty") String> tariffIds;
 

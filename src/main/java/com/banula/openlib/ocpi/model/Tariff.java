@@ -1,8 +1,8 @@
 package com.banula.openlib.ocpi.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.banula.openlib.ocpi.model.enums.TariffType;
 import com.banula.openlib.ocpi.model.vo.DisplayText;
 import com.banula.openlib.ocpi.model.vo.EnergyMix;
@@ -10,6 +10,10 @@ import com.banula.openlib.ocpi.model.vo.Price;
 import com.banula.openlib.ocpi.model.vo.TariffElement;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -19,9 +23,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @ToString
@@ -125,7 +126,11 @@ public class Tariff {
      */
     @JsonProperty("energy_mix")
     @Valid
-    @NotNull(message = "energy_mix is a required field in Banula Style of Charging.")
+    // TODO verify how to require this directly in the tariff manager later to be
+    // banula compliant, by now it should be OCPI Compliant and not to deny a Tariff
+    // with this field empty
+    // @NotNull(message = "energy_mix is a required field in Banula Style of
+    // Charging.")
     private EnergyMix energyMix;
 
     /**

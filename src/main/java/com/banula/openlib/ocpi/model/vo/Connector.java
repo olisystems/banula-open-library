@@ -89,7 +89,10 @@ public class Connector {
      * used can also have influence on the
      * maximum power
      */
-    @NotNull(message = "max_electric_power is a required field in Banula style of Charging")
+    // Todo: verify if this could be also a required field in the NSP and accept
+    // Locations with this field empty/null to keep ocpi compliance
+    // @NotNull(message = "max_electric_power is a required field in Banula style of
+    // Charging")
     @JsonProperty("max_electric_power")
     private Integer maxElectricPower;
 
@@ -108,7 +111,10 @@ public class Connector {
      * defined "free of charge" tariff.
      */
     @JsonProperty("tariff_ids")
-    @NotNull(message = "tariff_ids is a required field in Banula style of Charging")
+    // Todo: verify if this could be also a required field in the NSP and accept
+    // Locations with this field empty/null to keep ocpi compliance
+    // @NotNull(message = "tariff_ids is a required field in Banula style of
+    // Charging")
     private List<@NotEmpty(message = "tariff_id must not be empty") String> tariffIds;
 
     /**

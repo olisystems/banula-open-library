@@ -165,10 +165,7 @@ public class Location {
     /**
      * List of EVSEs that belong to this Location.
      */
-    // TODO: include this valid field to also validate nested evse and connectors
-    // once we have defined how to handle not required fields by ocpi that are set
-    // as required fields in Banula. Example: Tariff.max_enetric_power
-    // @Valid
+    @Valid
     @JsonProperty("evses")
     private List<EVSE> evses;
 

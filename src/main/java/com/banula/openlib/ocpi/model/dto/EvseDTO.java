@@ -1,8 +1,8 @@
 package com.banula.openlib.ocpi.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.banula.openlib.ocpi.model.enums.Capability;
 import com.banula.openlib.ocpi.model.enums.ParkingRestriction;
 import com.banula.openlib.ocpi.model.enums.Status;
@@ -11,6 +11,10 @@ import com.banula.openlib.ocpi.model.vo.Image;
 import com.banula.openlib.ocpi.model.vo.StatusSchedule;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -18,9 +22,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -33,7 +34,7 @@ public class EvseDTO {
     private String uid;
 
     @Size(max = 48, message = "EVSE ID cannot be longer than 48 characters")
-    @NotEmpty(message = "EvseId is a required field in Banula style of Charging")
+    @NotEmpty(message = "EvseId is a required field")
     @JsonProperty("evse_id")
     private String evseId;
 

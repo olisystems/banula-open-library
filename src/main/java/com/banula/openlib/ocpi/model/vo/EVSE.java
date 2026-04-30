@@ -1,14 +1,18 @@
 package com.banula.openlib.ocpi.model.vo;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.banula.openlib.ocpi.model.enums.Capability;
+import com.banula.openlib.ocpi.model.enums.ParkingRestriction;
+import com.banula.openlib.ocpi.model.enums.Status;
+import com.banula.openlib.ocpi.util.GeoLocationDeserializer;
+import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
+import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.banula.openlib.ocpi.model.enums.Capability;
-import com.banula.openlib.ocpi.util.GeoLocationDeserializer;
-import com.banula.openlib.ocpi.model.enums.ParkingRestriction;
-import com.banula.openlib.ocpi.model.enums.Status;
-import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
-import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -17,9 +21,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @ToString
@@ -54,7 +55,7 @@ public class EVSE {
      */
     @JsonProperty("evse_id")
     @Size(max = 48, message = "EVSE ID cannot be longer than 48 characters")
-    @NotEmpty(message = "EvseId is a required field in Banula style of Charging")
+    @NotEmpty(message = "EvseId is a required field")
     private String evseId;
 
     /**

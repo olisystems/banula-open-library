@@ -1,14 +1,17 @@
 package com.banula.openlib.ocpi.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+
 import com.banula.openlib.ocpi.model.enums.ProfileType;
 import com.banula.openlib.ocpi.model.enums.TokenType;
 import com.banula.openlib.ocpi.model.enums.WhitelistType;
 import com.banula.openlib.ocpi.model.vo.EnergyContract;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -17,8 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -79,7 +80,6 @@ public class TokenDTO {
 
     @JsonProperty("energy_contract")
     @Valid
-    @NotNull(message = "energy_contract is a required field in Banula style of charging")
     private EnergyContract energyContract;
 
     @JsonProperty("last_updated")
