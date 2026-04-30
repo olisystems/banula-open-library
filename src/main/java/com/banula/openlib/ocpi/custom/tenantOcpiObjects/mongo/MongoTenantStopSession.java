@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Document("#{@MongoCollectionMapper.getStopSessionCollectionName()}")
-@CompoundIndex(name = "unique_tenant_stop_session", def = "{'countryCode': 1, 'partyId': 1, 'id': 1, 'tenant': 1}", unique = true)
+@CompoundIndex(name = "unique_stop_session", def = "{'sessionId': 1, 'responseUrl': 1}", unique = true)
 public class MongoTenantStopSession extends TenantStopSession {
 
     @Id

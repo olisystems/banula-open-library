@@ -1,14 +1,9 @@
 package com.banula.openlib.mongodb.util;
 
-import com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo.*;
-import com.banula.openlib.ocpi.mapper.GenericMapper;
-import com.banula.openlib.ocpi.model.*;
-import com.banula.openlib.ocpi.model.mongo.MongoCDR;
-import com.banula.openlib.ocpi.model.mongo.MongoChargingSession;
-import com.banula.openlib.ocpi.model.mongo.MongoLocation;
-import com.banula.openlib.ocpi.model.mongo.MongoTariff;
-import com.banula.openlib.ocpi.model.mongo.MongoToken;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -18,10 +13,23 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo.MongoTenantCDR;
+import com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo.MongoTenantChargingSession;
+import com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo.MongoTenantLocation;
+import com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo.MongoTenantTariff;
+import com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo.MongoTenantToken;
+import com.banula.openlib.ocpi.mapper.GenericMapper;
+import com.banula.openlib.ocpi.model.CDR;
+import com.banula.openlib.ocpi.model.ChargingSession;
+import com.banula.openlib.ocpi.model.Location;
+import com.banula.openlib.ocpi.model.Tariff;
+import com.banula.openlib.ocpi.model.Token;
+import com.banula.openlib.ocpi.model.mongo.MongoCDR;
+import com.banula.openlib.ocpi.model.mongo.MongoChargingSession;
+import com.banula.openlib.ocpi.model.mongo.MongoLocation;
+import com.banula.openlib.ocpi.model.mongo.MongoTariff;
+import com.banula.openlib.ocpi.model.mongo.MongoToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ConditionalOnClass(MongoTemplate.class)
 @Component

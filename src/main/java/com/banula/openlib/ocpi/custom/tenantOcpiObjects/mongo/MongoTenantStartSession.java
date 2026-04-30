@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Document("#{@MongoCollectionMapper.getStartSessionCollectionName()}")
-@CompoundIndex(name = "unique_tenant_start_session", def = "{'countryCode': 1, 'partyId': 1, 'id': 1, 'tenant': 1}", unique = true)
+@CompoundIndex(name = "unique_start_session", def = "{'locationId': 1, 'evseUid': 1, 'connectorId': 1, 'authorizationReference': 1, 'responseUrl': 1}", unique = true)
 public class MongoTenantStartSession extends TenantStartSession {
 
     @Id
