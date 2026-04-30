@@ -4,6 +4,7 @@ import com.banula.openlib.ocpi.model.StopSession;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class TenantStopSession extends StopSession {
     @JsonProperty("tenant")
-    @NotEmpty(message = "Tenant cannot be empty")
+    @NotEmpty(message = "Tenant id cannot be empty")
+    @Size(min = 6, max = 6, message = "Tenant id must be exactly 6 characters. Ex: DE_ABC")
     private String tenant;
 }

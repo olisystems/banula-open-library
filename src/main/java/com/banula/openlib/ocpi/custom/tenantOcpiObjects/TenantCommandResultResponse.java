@@ -4,6 +4,7 @@ import com.banula.openlib.ocpi.model.vo.CommandResultResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,7 +18,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class TenantCommandResultResponse extends CommandResultResponse {
     @JsonProperty("tenant")
-    @NotEmpty(message = "Tenant cannot be empty")
+    @NotEmpty(message = "Tenant id cannot be empty")
+    @Size(min = 6, max = 6, message = "Tenant id must be exactly 6 characters. Ex: DE_ABC")
     private String tenant;
 
 }
