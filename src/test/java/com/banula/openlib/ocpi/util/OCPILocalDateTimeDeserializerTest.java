@@ -54,7 +54,7 @@ class OCPILocalDateTimeDeserializerTest {
     }
 
     @Test
-    @DisplayName("Should deserialize yyyy-MM-ddTHH:mm:ss.SSSZ")
+    @DisplayName("Should deserialize yyyy-MM-ddTHH:mm:ss.SSSSSSZ (microseconds with Z)")
     void testWithNanoWithZ() throws Exception {
         String json = "{\"timestamp\": \"2025-04-17T17:07:32.123456Z\"}";
         TimestampWrapper wrapper = objectMapper.readValue(json, TimestampWrapper.class);
@@ -62,7 +62,7 @@ class OCPILocalDateTimeDeserializerTest {
     }
 
     @Test
-    @DisplayName("Should deserialize yyyy-MM-ddTHH:mm:ss.SSSZ")
+    @DisplayName("Should deserialize yyyy-MM-ddTHH:mm:ss.SSSSSS (microseconds without Z)")
     void testWithNanoWithOutZ() throws Exception {
         String json = "{\"timestamp\": \"2025-04-17T17:07:32.123456\"}";
         TimestampWrapper wrapper = objectMapper.readValue(json, TimestampWrapper.class);

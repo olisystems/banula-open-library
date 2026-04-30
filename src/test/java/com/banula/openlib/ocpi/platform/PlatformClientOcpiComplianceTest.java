@@ -13,6 +13,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -85,7 +86,7 @@ public class PlatformClientOcpiComplianceTest {
         dto.setCountry("DEU");
         dto.setTimeZone("Europe/Berlin");
         dto.setCoordinates(new GeoLocationDTO("52.5200", "13.4050"));
-        dto.setLastUpdated(LocalDateTime.now());
+        dto.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         try {
             helper.validateOcpiCompliance(dto, HttpMethod.PUT);
         } catch (Exception e) {
@@ -122,7 +123,7 @@ public class PlatformClientOcpiComplianceTest {
         EnergyContract ec = new EnergyContract();
         ec.setSupplierName("GreenEnergy AG");
         dto.setEnergyContract(ec);
-        dto.setLastUpdated(LocalDateTime.now());
+        dto.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         try {
             helper.validateOcpiCompliance(dto, HttpMethod.PUT);
         } catch (Exception e) {
@@ -181,8 +182,8 @@ public class PlatformClientOcpiComplianceTest {
         dto.setCountryCode("DE");
         dto.setPartyId("ABC");
         dto.setId("CDR-001");
-        dto.setStartDateTime(LocalDateTime.now().minusHours(1));
-        dto.setEndDateTime(LocalDateTime.now());
+        dto.setStartDateTime(LocalDateTime.now(ZoneOffset.UTC).minusHours(1));
+        dto.setEndDateTime(LocalDateTime.now(ZoneOffset.UTC));
         dto.setCdrToken(CdrToken.builder()
                 .uid("TOKEN-001")
                 .type(TokenType.RFID)
@@ -205,7 +206,7 @@ public class PlatformClientOcpiComplianceTest {
         dto.setTotalCost(new Price(0.0f));
         dto.setTotalEnergy(1.0f);
         dto.setTotalTime(0.5f);
-        dto.setLastUpdated(LocalDateTime.now());
+        dto.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         try {
             helper.validateOcpiCompliance(dto, HttpMethod.PUT);
         } catch (Exception e) {
@@ -239,14 +240,14 @@ public class PlatformClientOcpiComplianceTest {
         connector.setMaxAmperage(16);
         connector.setMaxElectricPower(3680);
         connector.setTariffIds(List.of("TARIFF-001"));
-        connector.setLastUpdated(LocalDateTime.now());
+        connector.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
 
         EvseDTO dto = new EvseDTO();
         dto.setUid("EVSE-001");
         dto.setEvseId("DE*ABC*E001");
         dto.setStatus(Status.AVAILABLE);
         dto.setConnectors(List.of(connector));
-        dto.setLastUpdated(LocalDateTime.now());
+        dto.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         try {
             helper.validateOcpiCompliance(dto, HttpMethod.PUT);
         } catch (Exception e) {
@@ -280,7 +281,7 @@ public class PlatformClientOcpiComplianceTest {
         dto.setMaxAmperage(16);
         dto.setMaxElectricPower(3680);
         dto.setTariffIds(List.of("TARIFF-001"));
-        dto.setLastUpdated(LocalDateTime.now());
+        dto.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         try {
             helper.validateOcpiCompliance(dto, HttpMethod.PUT);
         } catch (Exception e) {

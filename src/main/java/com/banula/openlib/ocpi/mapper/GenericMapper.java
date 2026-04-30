@@ -55,9 +55,9 @@ public class GenericMapper {
     }
 
     public <T, D> List<D> toDTOList(List<T> entities, Class<D> dtoClass) {
-        List<D> dtos = new ArrayList<>();
         if (entities == null)
-            return dtos;
+            return null;
+        List<D> dtos = new ArrayList<>();
         for (T entity : entities) {
             dtos.add(toDTO(entity, dtoClass));
         }
@@ -65,9 +65,9 @@ public class GenericMapper {
     }
 
     public <D, T> List<T> fromDTOList(List<D> dtos, Class<T> entityClass) {
-        List<T> entities = new ArrayList<>();
         if (dtos == null)
-            return entities;
+            return null;
+        List<T> entities = new ArrayList<>();
         for (D dto : dtos) {
             entities.add(fromDTO(dto, entityClass));
         }

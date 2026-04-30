@@ -52,7 +52,7 @@ public class Tariff {
      * platforms).
      */
     @JsonProperty("id")
-    @Size(max = 36, message = "tariff_ids must be at most 36 characters")
+    @Size(max = 36, message = "Tariff id must be at most 36 characters")
     @NotEmpty(message = "Tariff ID cannot be empty.")
     private String id;
 

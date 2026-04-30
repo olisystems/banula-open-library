@@ -28,7 +28,8 @@ public class GeoLocationDeserializer extends JsonDeserializer<GeoLocation> {
             return null;
         }
 
-        // OCPI GeoJSON format: {"type": "Point", "coordinates": [lat, lon]}
+        // Internal GeoJSON-like format (non-standard): {"type": "Point", "coordinates": [lat, lon]}
+        // Note: standard GeoJSON uses [longitude, latitude]; this project uses [latitude, longitude].
         if (node.has("coordinates") && node.get("coordinates").isArray()) {
             JsonNode coordsNode = node.get("coordinates");
             if (coordsNode.size() >= 2) {

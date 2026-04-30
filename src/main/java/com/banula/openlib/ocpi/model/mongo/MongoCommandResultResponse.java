@@ -1,6 +1,5 @@
 package com.banula.openlib.ocpi.model.mongo;
 
-import com.banula.openlib.mongodb.interfaces.HasMongoOcpiCompositeId;
 import com.banula.openlib.ocpi.model.vo.CommandResultResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
