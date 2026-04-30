@@ -1,8 +1,8 @@
 package com.banula.openlib.ocpi.util;
 
-import com.banula.openlib.ocpi.model.CDR;
-import com.banula.openlib.ocpi.model.dto.CdrDTO;
 import java.util.Optional;
+
+import com.banula.openlib.ocpi.model.dto.CdrDTO;
 
 public class CdrIdUtil {
 
