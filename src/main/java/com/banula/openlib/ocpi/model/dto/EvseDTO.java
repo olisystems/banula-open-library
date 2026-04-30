@@ -47,7 +47,7 @@ public class EvseDTO {
     @JsonProperty("capabilities")
     private List<Capability> capabilities;
 
-    @NotNull(message = "Connectors cannot be empty")
+    @NotEmpty(message = "Connectors cannot be empty")
     @Valid
     @JsonProperty("connectors")
     private List<ConnectorDTO> connectors;

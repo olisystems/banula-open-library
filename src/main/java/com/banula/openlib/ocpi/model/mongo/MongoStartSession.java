@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @NoArgsConstructor(force = true)
 @Document("#{@MongoCollectionMapper.getStartSessionCollectionName()}")
-@CompoundIndex(name = "unique_start_session_base", def = "{'countryCode': 1, 'partyId': 1, 'id': 1}", unique = true)
 public class MongoStartSession extends StartSession {
 
     @Id

@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @NoArgsConstructor(force = true)
 @Document("#{@MongoCollectionMapper.getStopSessionCollectionName()}")
-@CompoundIndex(name = "unique_stop_session_base", def = "{'countryCode': 1, 'partyId': 1, 'id': 1}", unique = true)
 public class MongoStopSession extends StopSession {
 
     @Id

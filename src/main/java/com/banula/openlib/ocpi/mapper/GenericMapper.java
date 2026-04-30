@@ -1,16 +1,27 @@
 package com.banula.openlib.ocpi.mapper;
 
-import com.banula.openlib.ocpi.model.*;
-import com.banula.openlib.ocpi.model.dto.*;
-import com.banula.openlib.ocpi.model.vo.Connector;
-import com.banula.openlib.ocpi.model.vo.EVSE;
-import com.banula.openlib.ocpi.model.vo.GeoLocation;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.banula.openlib.ocpi.model.CDR;
+import com.banula.openlib.ocpi.model.ChargingSession;
+import com.banula.openlib.ocpi.model.Location;
+import com.banula.openlib.ocpi.model.Tariff;
+import com.banula.openlib.ocpi.model.Token;
+import com.banula.openlib.ocpi.model.dto.CdrDTO;
+import com.banula.openlib.ocpi.model.dto.ChargingSessionDTO;
+import com.banula.openlib.ocpi.model.dto.ConnectorDTO;
+import com.banula.openlib.ocpi.model.dto.EvseDTO;
+import com.banula.openlib.ocpi.model.dto.GeoLocationDTO;
+import com.banula.openlib.ocpi.model.dto.LocationDTO;
+import com.banula.openlib.ocpi.model.dto.TariffDTO;
+import com.banula.openlib.ocpi.model.dto.TokenDTO;
+import com.banula.openlib.ocpi.model.vo.Connector;
+import com.banula.openlib.ocpi.model.vo.EVSE;
+import com.banula.openlib.ocpi.model.vo.GeoLocation;
 
 @Component
 public class GenericMapper {

@@ -1,14 +1,26 @@
 package com.banula.openlib.ocpi.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.banula.openlib.ocpi.model.enums.Facility;
 import com.banula.openlib.ocpi.model.enums.ParkingType;
-import com.banula.openlib.ocpi.model.vo.*;
+import com.banula.openlib.ocpi.model.vo.AdditionalGeoLocation;
+import com.banula.openlib.ocpi.model.vo.BusinessDetails;
+import com.banula.openlib.ocpi.model.vo.DisplayText;
+import com.banula.openlib.ocpi.model.vo.EVSE;
+import com.banula.openlib.ocpi.model.vo.EnergyMix;
+import com.banula.openlib.ocpi.model.vo.GeoLocation;
+import com.banula.openlib.ocpi.model.vo.Hours;
+import com.banula.openlib.ocpi.model.vo.Image;
+import com.banula.openlib.ocpi.model.vo.PublishTokenType;
 import com.banula.openlib.ocpi.util.GeoLocationDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -18,9 +30,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * The Location object describes the location and its properties where a group
@@ -156,6 +165,10 @@ public class Location {
     /**
      * List of EVSEs that belong to this Location.
      */
+    // TODO: include this valid field to also validate nested evse and connectors
+    // once we have defined how to handle not required fields by ocpi that are set
+    // as required fields in Banula. Example: Tariff.max_enetric_power
+    // @Valid
     @JsonProperty("evses")
     private List<EVSE> evses;
 

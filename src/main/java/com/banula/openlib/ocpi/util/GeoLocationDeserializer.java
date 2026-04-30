@@ -28,7 +28,7 @@ public class GeoLocationDeserializer extends JsonDeserializer<GeoLocation> {
             return null;
         }
 
-        // Native GeoJSON format: {"type": "Point", "coordinates": [lat, lon]}
+        // OCPI GeoJSON format: {"type": "Point", "coordinates": [lat, lon]}
         if (node.has("coordinates") && node.get("coordinates").isArray()) {
             JsonNode coordsNode = node.get("coordinates");
             if (coordsNode.size() >= 2) {

@@ -51,6 +51,7 @@ public class Tariff {
      * platforms).
      */
     @JsonProperty("id")
+    @Size(max = 36, message = "tariff_ids must be at most 36 characters")
     @NotEmpty(message = "Tariff ID cannot be empty.")
     private String id;
 
@@ -119,7 +120,8 @@ public class Tariff {
 
     /**
      * Details on the energy supplied with this tariff.
-     * This field is required in Banula, in order to differentiate traditional roaming from ours.
+     * This field is required in Banula, in order to differentiate traditional
+     * roaming from ours.
      */
     @JsonProperty("energy_mix")
     @Valid

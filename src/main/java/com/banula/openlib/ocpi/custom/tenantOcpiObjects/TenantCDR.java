@@ -1,6 +1,7 @@
 package com.banula.openlib.ocpi.custom.tenantOcpiObjects;
 
 import com.banula.openlib.ocpi.model.CDR;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

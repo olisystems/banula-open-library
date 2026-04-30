@@ -1,7 +1,8 @@
 package com.banula.openlib.ocpi.custom.tenantOcpiObjects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.banula.openlib.ocpi.model.Location;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;

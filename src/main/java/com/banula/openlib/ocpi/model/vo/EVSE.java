@@ -80,7 +80,7 @@ public class EVSE {
      * List of available connectors on the EVSE.
      */
     @JsonProperty("connectors")
-    @NotNull(message = "Connectors cannot be empty")
+    @NotEmpty(message = "Connectors cannot be empty")
     @Valid
     private List<Connector> connectors;
 

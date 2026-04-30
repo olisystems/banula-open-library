@@ -52,7 +52,6 @@ public class ConnectorDTO {
     @JsonProperty("max_electric_power")
     private Integer maxElectricPower;
 
-    @Size(max = 36, message = "tariff_ids must be at most 36 characters")
     @NotNull(message = "tariff_ids is a required field in Banula style of Charging")
     @JsonProperty("tariff_ids")
     private List<@NotEmpty(message = "tariff_id must not be empty") String> tariffIds;
