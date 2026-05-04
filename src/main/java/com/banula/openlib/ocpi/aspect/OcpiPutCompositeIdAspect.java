@@ -1,14 +1,16 @@
 package com.banula.openlib.ocpi.aspect;
 
-import com.banula.openlib.ocpi.exception.OCPICustomException;
-import com.banula.openlib.ocpi.util.Constants;
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Field;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Field;
+import com.banula.openlib.ocpi.exception.OCPICustomException;
+import com.banula.openlib.ocpi.util.Constants;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * AOP aspect for {@link com.banula.openlib.ocpi.annotation.OcpiPutCompositeId}.
@@ -89,13 +91,7 @@ public class OcpiPutCompositeIdAspect {
 
     private void validateField(Object dto, String fieldName, String jsonName, String pathValue) {
         String dtoValue = (String) getField(dto, fieldName);
-        if (dtoValue == null || dtoValue.isBlank()) {
-            String message = String.format("Payload field '%s' is missing or empty", jsonName);
-            log.error(message);
-            throw new OCPICustomException(message, Constants.STATUS_CODE_INVALID_OR_MISSING_PARAMETERS);
-        }
-
-        if (!dtoValue.equals(pathValue)) {
+        if (dtoValue != null && !dtoValue.isEmpty() && !dtoValue.equals(pathValue)) {
             String message = String.format(
                     "Payload field '%s' value '%s' does not match path variable value '%s'",
                     jsonName, dtoValue, pathValue);
