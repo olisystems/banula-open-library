@@ -101,6 +101,7 @@ public class Tariff {
      */
     @JsonProperty("elements")
     @NotNull(message = "Tariff elements cannot be empty.")
+    @Valid
     private List<TariffElement> elements;
 
     /**

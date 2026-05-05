@@ -54,6 +54,7 @@ public class TariffDTO {
     @JsonProperty("max_price")
     private Price maxPrice;
     @NotNull
+    @Valid
     private List<TariffElement> elements;
     @JsonProperty("start_date_time")
     @JsonDeserialize(using = OCPILocalDateTimeDeserializer.class)

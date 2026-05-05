@@ -1,21 +1,30 @@
 package com.banula.openlib.ocpi.model;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.banula.openlib.ocpi.model.enums.AuthMethod;
+import com.banula.openlib.ocpi.model.vo.CdrLocation;
+import com.banula.openlib.ocpi.model.vo.CdrToken;
+import com.banula.openlib.ocpi.model.vo.ChargingPeriod;
+import com.banula.openlib.ocpi.model.vo.Price;
+import com.banula.openlib.ocpi.model.vo.SignedData;
+import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
+import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.banula.openlib.ocpi.model.enums.AuthMethod;
-import com.banula.openlib.ocpi.model.vo.*;
-import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
-import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @ToString
@@ -92,6 +101,7 @@ public class CDR {
      */
     @JsonProperty("cdr_token")
     @NotNull(message = "CDR token cannot be null")
+    @Valid
     private CdrToken cdrToken;
 
     /**
@@ -124,6 +134,7 @@ public class CDR {
      */
     @JsonProperty("cdr_location")
     @NotNull(message = "CDR location cannot be null")
+    @Valid
     private CdrLocation cdrLocation;
 
     /**
@@ -168,6 +179,7 @@ public class CDR {
      */
     @JsonProperty("total_cost")
     @NotNull(message = "Total cost cannot be null")
+    @Valid
     private Price totalCost;
 
     /**

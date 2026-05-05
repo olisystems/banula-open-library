@@ -1,14 +1,16 @@
 package com.banula.openlib.ocpi.model.dto;
 
+import java.util.List;
+
 import com.banula.openlib.ocpi.model.vo.CredentialsRole;
+
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -23,5 +25,6 @@ public class CredentialsDTO {
     private String url;
 
     @NotNull(message = "Roles must not be blank")
+    @Valid
     private List<CredentialsRole> roles;
 }
