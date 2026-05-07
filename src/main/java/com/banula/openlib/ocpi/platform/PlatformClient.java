@@ -1,16 +1,13 @@
 package com.banula.openlib.ocpi.platform;
 
-import org.springframework.http.HttpHeaders;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +31,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -230,7 +229,7 @@ public class PlatformClient {
     }
 
     private String getOcnVersionDetailsUrl(String tenantId) {
-        return platformConfiguration.getPlatformUrl() + "/" + tenantId + "/ocpi/ocn-version-details";
+        return platformConfiguration.getPlatformUrl() + "/api/v1/public/" + tenantId + "/ocpi/ocn-version-details";
     }
 
 }
