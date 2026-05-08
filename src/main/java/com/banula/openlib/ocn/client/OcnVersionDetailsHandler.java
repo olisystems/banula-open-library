@@ -1,10 +1,10 @@
 package com.banula.openlib.ocn.client;
 
-import com.banula.openlib.ocn.model.OcnVersionDetails;
+import com.banula.openlib.ocpi.model.VersionDetails;
 
 public interface OcnVersionDetailsHandler {
-    OcnVersionDetails getVersionDetails();
+    VersionDetails getVersionDetails();
 
-    void saveVersionDetails(OcnVersionDetails endpointResponse);
+    void saveVersionDetails(VersionDetails endpointResponse);
 
 }

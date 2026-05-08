@@ -17,9 +17,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.banula.openlib.ocn.client.GenericTypeRefUtil;
-import com.banula.openlib.ocn.model.OcnVersionDetails;
 import com.banula.openlib.ocpi.exception.OCPICustomException;
 import com.banula.openlib.ocpi.model.OcpiResponse;
+import com.banula.openlib.ocpi.model.VersionDetails;
 import com.banula.openlib.ocpi.model.enums.InterfaceRole;
 import com.banula.openlib.ocpi.model.enums.ModuleID;
 import com.banula.openlib.ocpi.model.vo.Endpoint;
@@ -137,14 +137,14 @@ public class PlatformClient {
             HttpHeaders headers = createHeaders();
             String platformEndpoint = getOcnVersionDetailsUrl(tenantId);
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<OcpiResponse<OcnVersionDetails>> response = restTemplate.exchange(
+            ResponseEntity<OcpiResponse<VersionDetails>> response = restTemplate.exchange(
                     platformEndpoint,
                     HttpMethod.GET,
                     entity,
-                    new ParameterizedTypeReference<OcpiResponse<OcnVersionDetails>>() {
+                    new ParameterizedTypeReference<OcpiResponse<VersionDetails>>() {
                     });
             int httpStatus = response.getStatusCode().value();
-            OcpiResponse<OcnVersionDetails> responseBody = response.getBody();
+            OcpiResponse<VersionDetails> responseBody = response.getBody();
             if (responseBody == null) {
                 String msg = String.format("Platform returned empty body for OCN version details (HTTP %d)",
                         httpStatus);
@@ -158,7 +158,7 @@ public class PlatformClient {
                 log.error("Tenant ID: {} | {}", tenantId, msg);
                 throw new OCPICustomException(msg);
             }
-            OcnVersionDetails details = responseBody.getData();
+            VersionDetails details = responseBody.getData();
             if (details == null) {
                 String msg = String.format(
                         "Platform returned no data for OCN version details (status_code %d, HTTP %d)",

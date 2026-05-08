@@ -8,19 +8,28 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.hc.client5.http.classic.HttpClient;
-import com.banula.openlib.ocpi.model.enums.Role;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.banula.openlib.ocn.Notary;
-import com.banula.openlib.ocn.model.*;
+import com.banula.openlib.ocn.model.OcnClientConfiguration;
+import com.banula.openlib.ocn.model.OcnCredential;
+import com.banula.openlib.ocn.model.OcnRegistrationRequest;
+import com.banula.openlib.ocn.model.OcnRegistrationResponse;
+import com.banula.openlib.ocn.model.ValuesToSign;
 import com.banula.openlib.ocpi.model.OcpiErrorResponse;
 import com.banula.openlib.ocpi.model.OcpiResponse;
+import com.banula.openlib.ocpi.model.VersionDetails;
 import com.banula.openlib.ocpi.model.dto.CredentialsDTO;
+import com.banula.openlib.ocpi.model.enums.Role;
 import com.banula.openlib.ocpi.model.vo.BusinessDetails;
 import com.banula.openlib.ocpi.model.vo.CredentialsRole;
 import com.banula.openlib.ocpi.model.vo.Endpoint;
@@ -94,7 +103,7 @@ public class OcnClient {
             }
 
             verifyAndSetGeneratedTokenC(generatedTokenC);
-            OcnVersionDetails endpointResponse = this.getVersionDetails();
+            VersionDetails endpointResponse = this.getVersionDetails();
 
             log.info("OCN Node: Ocpi Version: {} | Endpoints: {}", endpointResponse.getVersion(),
                     endpointResponse.getEndpoints().size());
@@ -464,25 +473,25 @@ public class OcnClient {
      *         their URLs
      * @throws Exception if communication fails
      */
-    public OcnVersionDetails getVersionDetails() throws Exception {
+    public VersionDetails getVersionDetails() throws Exception {
         try {
             // Create the URL for the endpoints resource
             String url = String.format("%s/ocpi/2.2.1", configuration.getNodeUrl());
 
             // Define the response type (a wrapper containing a list of endpoints)
-            ParameterizedTypeReference<OcpiResponse<OcnVersionDetails>> responseTypeRef = new ParameterizedTypeReference<OcpiResponse<OcnVersionDetails>>() {
+            ParameterizedTypeReference<OcpiResponse<VersionDetails>> responseTypeRef = new ParameterizedTypeReference<OcpiResponse<VersionDetails>>() {
             };
 
             // Make the HTTP request
             HttpHeaders headers = this.createHeaders();
-            OcpiResponse<OcnVersionDetails> response = this._call(url, null, new HashMap<>(), headers,
+            OcpiResponse<VersionDetails> response = this._call(url, null, new HashMap<>(), headers,
                     responseTypeRef, HttpMethod.GET, new ArrayList<>(), null);
 
             // Return the endpoints from the response
             if (response != null && response.getData() != null) {
                 return response.getData();
             }
-            return new OcnVersionDetails();
+            return new VersionDetails();
         } catch (Exception ex) {
             log.error("Failed to retrieve OCPI endpoints: {}", ex.getMessage());
             throw ex;
