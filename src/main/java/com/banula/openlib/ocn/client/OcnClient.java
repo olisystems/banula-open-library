@@ -31,6 +31,7 @@ import com.banula.openlib.ocpi.model.OcpiResponse;
 import com.banula.openlib.ocpi.model.Version;
 import com.banula.openlib.ocpi.model.VersionDetails;
 import com.banula.openlib.ocpi.model.dto.CredentialsDTO;
+import com.banula.openlib.ocpi.model.enums.ModuleID;
 import com.banula.openlib.ocpi.model.enums.Role;
 import com.banula.openlib.ocpi.model.enums.VersionNumber;
 import com.banula.openlib.ocpi.model.vo.BusinessDetails;
@@ -539,8 +540,8 @@ public class OcnClient {
             ParameterizedTypeReference<OcpiResponse<VersionDetails>> responseTypeRef = new ParameterizedTypeReference<OcpiResponse<VersionDetails>>() {
             };
 
-            // Make the HTTP request using TokenC for authorization
-            HttpHeaders headers = this.createHeaders();
+            // Make the HTTP request using TokenA for authorization
+            HttpHeaders headers = this.createHeadersAuthTokenA();
             OcpiResponse<VersionDetails> response = this._call(versionDetailsUrl, null, new HashMap<>(), headers,
                     responseTypeRef, HttpMethod.GET, new ArrayList<>(), null);
 
@@ -704,7 +705,8 @@ public class OcnClient {
 
             // Find credentials endpoint
             for (Endpoint endpoint : versionDetails.getEndpoints()) {
-                if ("credentials".equals(endpoint.getIdentifier()) && "SENDER".equals(endpoint.getRole().toString())) {
+                if (ModuleID.CREDENTIALS.equals(endpoint.getIdentifier())
+                        && "SENDER".equals(endpoint.getRole().toString())) {
                     return endpoint.getUrl();
                 }
             }
