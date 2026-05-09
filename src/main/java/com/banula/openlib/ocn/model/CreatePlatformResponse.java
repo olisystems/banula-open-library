@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OcnRegistrationResponse {
+public class CreatePlatformResponse {
     private String token;
     private String versions;
 }

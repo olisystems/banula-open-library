@@ -8,9 +8,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OcnRegistrationRequest {
-    @JsonProperty("country_code")
-    private String countryCode;
+public class BasicRole {
     @JsonProperty("party_id")
     private String partyId;
+    
+    @JsonProperty("country_code")
+    private String countryCode;
 }
