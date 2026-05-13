@@ -1,14 +1,18 @@
 package com.banula.openlib.ocpi.model.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.banula.openlib.ocpi.model.dto.GeoLocationDTO;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.banula.openlib.ocpi.model.enums.Capability;
 import com.banula.openlib.ocpi.model.enums.ParkingRestriction;
 import com.banula.openlib.ocpi.model.enums.Status;
+import com.banula.openlib.ocpi.util.GeoLocationDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -17,9 +21,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @ToString
@@ -46,14 +47,15 @@ public class EVSE {
     /**
      * Compliant with the following specification for EVSE ID from "eMI3 standard
      * version V1.0"
-     * (<a href="http://emi3group.com/documents-links/">EMI3 reference</a>) "Part 2: business objects." Optional
+     * (<a href="http://emi3group.com/documents-links/">EMI3 reference</a>) "Part 2:
+     * business objects." Optional
      * because: if an evse_id is
      * to be re-used in the real world, the evse_id can be removed from an EVSE
      * object if the status is set to REMOVED.
      */
     @JsonProperty("evse_id")
     @Size(max = 48, message = "EVSE ID cannot be longer than 48 characters")
-    @NotEmpty(message = "EvseId is a required field in Banula style of Charging")
+    @NotEmpty(message = "EvseId is a required field")
     private String evseId;
 
     /**
@@ -79,7 +81,7 @@ public class EVSE {
      * List of available connectors on the EVSE.
      */
     @JsonProperty("connectors")
-    @NotNull(message = "Connectors cannot be empty")
+    @NotEmpty(message = "Connectors cannot be empty")
     @Valid
     private List<Connector> connectors;
 
@@ -95,8 +97,9 @@ public class EVSE {
      * Coordinates of the EVSE.
      */
     @JsonProperty("coordinates")
+    @JsonDeserialize(using = GeoLocationDeserializer.class)
     @Valid
-    private GeoLocationDTO coordinates;
+    private GeoLocation coordinates;
 
     /**
      * A number/string printed on the outside of the EVSE for visual

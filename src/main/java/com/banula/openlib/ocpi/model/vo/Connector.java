@@ -1,13 +1,17 @@
 package com.banula.openlib.ocpi.model.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.banula.openlib.ocpi.model.enums.ConnectorFormat;
 import com.banula.openlib.ocpi.model.enums.ConnectorType;
 import com.banula.openlib.ocpi.model.enums.PowerType;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,9 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * A Connector is the socket or cable and plug available for the EV to use. A
@@ -88,7 +89,10 @@ public class Connector {
      * used can also have influence on the
      * maximum power
      */
-    @NotNull(message = "max_electric_power is a required field in Banula style of Charging")
+    // Todo: verify if this could be also a required field in the NSP and accept
+    // Locations with this field empty/null to keep ocpi compliance
+    // @NotNull(message = "max_electric_power is a required field in Banula style of
+    // Charging")
     @JsonProperty("max_electric_power")
     private Integer maxElectricPower;
 
@@ -107,8 +111,10 @@ public class Connector {
      * defined "free of charge" tariff.
      */
     @JsonProperty("tariff_ids")
-    @Size(max = 36, message = "tariff_ids must be at most 36 characters")
-    @NotNull(message = "tariff_ids is a required field in Banula style of Charging")
+    // Todo: verify if this could be also a required field in the NSP and accept
+    // Locations with this field empty/null to keep ocpi compliance
+    // @NotNull(message = "tariff_ids is a required field in Banula style of
+    // Charging")
     private List<@NotEmpty(message = "tariff_id must not be empty") String> tariffIds;
 
     /**

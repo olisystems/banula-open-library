@@ -1,0 +1,25 @@
+package com.banula.openlib.ocpi.custom.tenantOcpiObjects.mongo;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.banula.openlib.ocpi.custom.tenantOcpiObjects.TenantStopSession;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@NoArgsConstructor
+@Document("#{@MongoCollectionMapper.getStopSessionCollectionName()}")
+@CompoundIndex(name = "unique_tenant_stop_session", def = "{'sessionId': 1, 'responseUrl': 1, 'tenant': 1}", unique = true)
+public class MongoTenantStopSession extends TenantStopSession {
+
+    @Id
+    private String mongoId;
+
+}

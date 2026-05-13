@@ -8,23 +8,6 @@ import org.springframework.beans.BeanUtils;
 
 @Mapper(componentModel = "spring")
 public interface TokenMapper {
-    static Token toTokenEntity(TokenDTO tokenDTO) {
-        if (tokenDTO == null) {
-            return null;
-        }
-        Token token = new Token();
-        BeanUtils.copyProperties(tokenDTO, token);
-        return token;
-    }
-
-    static TokenDTO toTokenDTO(Token token) {
-        if (token == null) {
-            return null;
-        }
-        TokenDTO tokenDTO = new TokenDTO();
-        BeanUtils.copyProperties(token, tokenDTO);
-        return tokenDTO;
-    }
 
     static CdrToken fromTokenToCdrToken(Token token) {
         return CdrToken.builder()

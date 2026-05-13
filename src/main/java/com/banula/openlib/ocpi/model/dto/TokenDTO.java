@@ -1,29 +1,30 @@
 package com.banula.openlib.ocpi.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+
 import com.banula.openlib.ocpi.model.enums.ProfileType;
 import com.banula.openlib.ocpi.model.enums.TokenType;
 import com.banula.openlib.ocpi.model.enums.WhitelistType;
 import com.banula.openlib.ocpi.model.vo.EnergyContract;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class TokenDTO {
     @NotEmpty(message = "Country code must not be blank")
     @Size(min = 1, max = 2, message = "Country code must be between 1 and 2 characters")
@@ -79,7 +80,6 @@ public class TokenDTO {
 
     @JsonProperty("energy_contract")
     @Valid
-    @NotNull(message = "energy_contract is a required field in Banula style of charging")
     private EnergyContract energyContract;
 
     @JsonProperty("last_updated")

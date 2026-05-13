@@ -1,25 +1,36 @@
 package com.banula.openlib.ocpi.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.banula.openlib.ocpi.model.enums.Facility;
-import com.banula.openlib.ocpi.model.enums.ParkingType;
-import com.banula.openlib.ocpi.model.vo.*;
-import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
-import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+
+import com.banula.openlib.ocpi.model.enums.Facility;
+import com.banula.openlib.ocpi.model.enums.ParkingType;
+import com.banula.openlib.ocpi.model.vo.AdditionalGeoLocation;
+import com.banula.openlib.ocpi.model.vo.BusinessDetails;
+import com.banula.openlib.ocpi.model.vo.DisplayText;
+import com.banula.openlib.ocpi.model.vo.EnergyMix;
+import com.banula.openlib.ocpi.model.vo.Hours;
+import com.banula.openlib.ocpi.model.vo.Image;
+import com.banula.openlib.ocpi.model.vo.PublishTokenType;
+import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
+import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @AllArgsConstructor
@@ -28,8 +39,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LocationDTO {
 
-    private static final Set<String> ISO_ALPHA3 =
-            Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA3);
+    private static final Set<String> ISO_ALPHA3 = Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA3);
 
     @NotEmpty(message = "Country code must not be blank")
     @Size(min = 1, max = 2, message = "Country code must be between 1 and 2 characters")
@@ -69,10 +79,8 @@ public class LocationDTO {
     @Size(min = 1, max = 20, message = "State must be between 1 and 20 characters")
     private String state;
 
-
     @NotNull
-    @Pattern(regexp = "^[A-Z]{3}$",
-            message = "country must be 3 upper-case letters (ISO 3166-1 alpha-3)")
+    @Pattern(regexp = "^[A-Z]{3}$", message = "country must be 3 upper-case letters (ISO 3166-1 alpha-3)")
     private String country;
 
     // in case of future queying by this field using newsphere requests (mongodb) it
@@ -87,7 +95,8 @@ public class LocationDTO {
     @JsonProperty("parking_type")
     private ParkingType parkingType;
 
-    private List<EVSE> evses;
+    @Valid
+    private List<EvseDTO> evses;
 
     private List<DisplayText> directions;
 
