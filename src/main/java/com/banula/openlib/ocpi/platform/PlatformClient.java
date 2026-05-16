@@ -12,17 +12,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.banula.openlib.ocn.client.GenericTypeRefUtil;
 import com.banula.openlib.ocpi.exception.OCPICustomException;
 import com.banula.openlib.ocpi.model.OcpiResponse;
-import com.banula.openlib.ocpi.model.VersionDetails;
 import com.banula.openlib.ocpi.model.enums.InterfaceRole;
 import com.banula.openlib.ocpi.model.enums.ModuleID;
-import com.banula.openlib.ocpi.model.vo.Endpoint;
+import com.banula.openlib.ocpi.model.enums.Role;
 import com.banula.openlib.ocpi.util.InfoUtils;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -39,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
+// TODO: move it to privatelib once ClientHubInfo module is moved drom NSP to
+// platform-banula
 public class PlatformClient {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -97,8 +97,10 @@ public class PlatformClient {
         log.info("Sending outflow request to platform for country code: {} and party id: {}", toOcpiCountryCode,
                 toOcpiPartyId);
         try {
-            HttpHeaders headers = createHeaders(toOcpiCountryCode, toOcpiPartyId);
-            String platformEndpoint = getOutflowUrl(tenantId, moduleID, interfaceRole);
+
+            String[] from = parseTenantId(tenantId);
+            HttpHeaders headers = createHeaders(from[0], from[1], toOcpiCountryCode, toOcpiPartyId);
+            String platformEndpoint = getOutflowUrl(moduleID, interfaceRole);
             String finalUrl = buildUrl(platformEndpoint, pathVariables, queryParams);
             HttpEntity<N> entity = new HttpEntity<>(body, headers);
             if (platformConfiguration.isToLogCurlCommands()) {
@@ -130,106 +132,65 @@ public class PlatformClient {
         return uriBuilder.encode().toUriString();
     }
 
-    public void updateOcnVersionDetailsFromPlatform(String tenantId) {
-        try {
-            log.info("Updating OCN version details from platform | Tenant ID: {} | Platform URL: {}",
-                    tenantId, platformConfiguration.getPlatformUrl());
-            HttpHeaders headers = createHeaders();
-            String platformEndpoint = getOcnVersionDetailsUrl(tenantId);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<OcpiResponse<VersionDetails>> response = restTemplate.exchange(
-                    platformEndpoint,
-                    HttpMethod.GET,
-                    entity,
-                    new ParameterizedTypeReference<OcpiResponse<VersionDetails>>() {
-                    });
-            int httpStatus = response.getStatusCode().value();
-            OcpiResponse<VersionDetails> responseBody = response.getBody();
-            if (responseBody == null) {
-                String msg = String.format("Platform returned empty body for OCN version details (HTTP %d)",
-                        httpStatus);
-                log.error("Tenant ID: {} | {}", tenantId, msg);
-                throw new OCPICustomException(msg);
-            }
-            if (responseBody.getStatus_code() != 1000) {
-                String msg = String.format(
-                        "Platform error retrieving OCN version details: %s (status_code %d, HTTP %d)",
-                        responseBody.getStatus_message(), responseBody.getStatus_code(), httpStatus);
-                log.error("Tenant ID: {} | {}", tenantId, msg);
-                throw new OCPICustomException(msg);
-            }
-            VersionDetails details = responseBody.getData();
-            if (details == null) {
-                String msg = String.format(
-                        "Platform returned no data for OCN version details (status_code %d, HTTP %d)",
-                        responseBody.getStatus_code(), httpStatus);
-                log.error("Tenant ID: {} | {}", tenantId, msg);
-                throw new OCPICustomException(msg);
-            }
-            platformConfiguration.setOcnVersionDetails(tenantId, details);
-        } catch (RestClientResponseException rex) {
-            String body = rex.getResponseBodyAsString();
-            String msg = String.format(
-                    "HTTP %d from platform while retrieving OCN version details: %s",
-                    rex.getStatusCode().value(), body);
-            log.error("Tenant ID: {} | {}", tenantId, msg);
-            throw new OCPICustomException(msg);
-        } catch (NullPointerException npe) {
-            String msg = "Failed to store OCN version details: platform configuration storage not initialized";
-            log.error("Tenant ID: {} | {}", tenantId, msg);
-            throw new OCPICustomException(msg);
-        } catch (Exception ex) {
-            log.error(
-                    "Tenant ID: {} | Error while retrieving or updating OCN version details from platform, error message: {}",
-                    tenantId, ex.getLocalizedMessage());
-            throw new OCPICustomException("Error while retrieving or updating OCN version details from platform");
-        }
-    }
-
-    private HttpHeaders createHeaders(String toOcpiCountryCode, String toOcpiPartyId) {
+    private HttpHeaders createHeaders(String fromOcpiCountryCode, String fromOcpiPartyId, String toOcpiCountryCode,
+            String toOcpiPartyId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Accept", "*/*");
         headers.set("X-Request-ID", UUID.randomUUID().toString());
         headers.set("X-Correlation-ID", UUID.randomUUID().toString());
+        headers.set("OCPI-from-country-code", fromOcpiCountryCode);
+        headers.set("OCPI-from-party-id", fromOcpiPartyId);
         headers.set("OCPI-to-country-code", toOcpiCountryCode);
         headers.set("OCPI-to-party-id", toOcpiPartyId);
         return headers;
     }
 
-    private HttpHeaders createHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Accept", "*/*");
-        headers.set("X-Request-ID", UUID.randomUUID().toString());
-        headers.set("X-Correlation-ID", UUID.randomUUID().toString());
-        return headers;
+    private String[] parseTenantId(String tenantId) {
+        if (tenantId == null || !tenantId.matches("^[A-Za-z]{2}_[A-Za-z0-9]{3}$")) {
+            throw new IllegalArgumentException(
+                    "Invalid tenantId format: '" + tenantId + "'. Expected <countryCode>_<partyId> (e.g. DE_ABC)");
+        }
+        return tenantId.split("_", 2);
     }
 
-    // get the proper ocn node endpoint retrieved from platform and build the
-    // outflow url taking into account the module id and interface role
-    public String getOutflowUrl(String tenantId, ModuleID moduleID, InterfaceRole interfaceRole) {
-        if (platformConfiguration.getOcnVersionDetails() == null) {
-            throw new IllegalArgumentException("OCN version details not found");
-        }
-        if (platformConfiguration.getOcnVersionDetails().get(tenantId) == null) {
-            throw new IllegalArgumentException("Tenant not found in OcnVersionDetails");
-        }
-
-        Endpoint endpoint = platformConfiguration.getOcnVersionDetails().get(tenantId).getEndpoints().stream()
-                .filter(e -> e.getIdentifier() == moduleID && e.getRole() == interfaceRole)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Endpoint not found"));
-        String url = endpoint.getUrl();
-        int startIndex = url.indexOf("ocpi/");
-        String endpointUrl = url.substring(startIndex);
-        return platformConfiguration.getPlatformUrl() + "/api/v1/internal/" + tenantId + "/outflow/"
-                + endpointUrl;
-
+    public String getOutflowUrl(ModuleID moduleID, InterfaceRole interfaceRole) {
+        String role = interfaceRole.name().toLowerCase();
+        return platformConfiguration.getPlatformUrl()
+                + "/api/v1/internal//outflow/ocpi/" + role
+                + "/" + platformConfiguration.getOcpiVersion()
+                + "/" + moduleID.value();
     }
 
-    private String getOcnVersionDetailsUrl(String tenantId) {
-        return platformConfiguration.getPlatformUrl() + "/api/v1/public/" + tenantId + "/ocpi/ocn-version-details";
+    public boolean verifyOcnCredentials() {
+        String url = platformConfiguration.getPlatformUrl() + "/admin/ocn-node/verify";
+        ResponseEntity<java.util.Map<String, Object>> response = restTemplate.exchange(
+                url, HttpMethod.POST, new HttpEntity<>(new HttpHeaders()),
+                new ParameterizedTypeReference<java.util.Map<String, Object>>() {
+                });
+        java.util.Map<String, Object> body = response.getBody();
+        return body != null && Boolean.TRUE.equals(body.get("is_valid"));
+    }
+
+    public boolean verifyThereAreRoleTenantsByRole(Role role) {
+        String url = platformConfiguration.getPlatformUrl() + "/admin/tenant/droplist/" + role.name();
+        ResponseEntity<List<String>> response = restTemplate.exchange(
+                url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()),
+                new ParameterizedTypeReference<List<String>>() {
+                });
+        List<String> tenants = response.getBody();
+        return tenants != null && !tenants.isEmpty();
+    }
+
+    public List<String> findTenantIdsByRole() {
+        Role role = platformConfiguration.getOcpiRole();
+        String url = platformConfiguration.getPlatformUrl() + "/admin/tenant/droplist/" + role.name();
+        ResponseEntity<List<String>> response = restTemplate.exchange(
+                url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()),
+                new ParameterizedTypeReference<List<String>>() {
+                });
+        List<String> tenants = response.getBody();
+        return tenants != null ? tenants : List.of();
     }
 
 }

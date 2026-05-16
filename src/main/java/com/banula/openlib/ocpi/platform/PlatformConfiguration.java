@@ -1,15 +1,14 @@
 package com.banula.openlib.ocpi.platform;
 
-import java.util.HashMap;
-
-import com.banula.openlib.ocpi.model.VersionDetails;
+import com.banula.openlib.ocpi.model.enums.Role;
+import com.banula.openlib.ocpi.model.enums.VersionNumber;
 
 public interface PlatformConfiguration {
     String getPlatformUrl();
 
-    HashMap<String, VersionDetails> getOcnVersionDetails();
+    Role getOcpiRole();
 
-    void setOcnVersionDetails(String tenantId, VersionDetails versionDetails);
+    VersionNumber getOcpiVersion();
 
     boolean isToLogCurlCommands();
 
