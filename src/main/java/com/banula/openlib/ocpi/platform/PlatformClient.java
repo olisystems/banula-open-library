@@ -157,13 +157,13 @@ public class PlatformClient {
     public String getOutflowUrl(ModuleID moduleID, InterfaceRole interfaceRole) {
         String role = interfaceRole.name().toLowerCase();
         return platformConfiguration.getPlatformUrl()
-                + "/api/v1/internal//outflow/ocpi/" + role
+                + "/api/v1/internal/outflow/ocpi/" + role
                 + "/" + platformConfiguration.getOcpiVersion()
                 + "/" + moduleID.value();
     }
 
     public boolean verifyOcnCredentials() {
-        String url = platformConfiguration.getPlatformUrl() + "/admin/ocn-node/verify";
+        String url = platformConfiguration.getPlatformUrl() + "/admin/ocn-communication/verify";
         ResponseEntity<java.util.Map<String, Object>> response = restTemplate.exchange(
                 url, HttpMethod.POST, new HttpEntity<>(new HttpHeaders()),
                 new ParameterizedTypeReference<java.util.Map<String, Object>>() {
