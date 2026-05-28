@@ -154,8 +154,9 @@ public class OcnClient {
         if (credentialsTokenC == null) {
             return null;
         }
-        // Set new tokenC
+        // Set and persist new tokenC
         configuration.setTokenC(credentialsTokenC);
+        ocnCredential.setTokenC(credentialsTokenC);
         ocnCredentialHandler.saveOcnCredential(ocnCredential);
 
         return credentialsTokenC;
