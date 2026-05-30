@@ -141,15 +141,33 @@ public class OcnClient {
         // Create platform and get response
         CreatePlatformResponse platformResponse = this.createPlatform();
 
+        // Get token A from platform response or use configured TokenA as fallback
+        String tokenA = platformResponse.getToken();
+        if (tokenA == null || tokenA.isBlank()) {
+            log.warn("OCN Node returned null/empty TokenA, using configured TokenA");
+            tokenA = configuration.getTokenA();
+        }
+        if (tokenA == null || tokenA.isBlank()) {
+            throw new Exception("TokenA is null or empty - cannot proceed with registration. " +
+                    "Please configure party.tokenA or ensure OCN Node returns a valid token.");
+        }
+
         // Save token A
-        ocnCredential.setTokenA(platformResponse.getToken());
-        configuration.setTokenA(platformResponse.getToken());
+        ocnCredential.setTokenA(tokenA);
+        configuration.setTokenA(tokenA);
+
+        // Get versions URL from response or construct default
+        String versionsUrl = platformResponse.getVersions();
+        if (versionsUrl == null || versionsUrl.isBlank()) {
+            versionsUrl = configuration.getNodeUrl() + "/ocpi/versions";
+            log.warn("OCN Node returned null/empty versions URL, using default: {}", versionsUrl);
+        }
 
         // Retrieve credentials URL from versions endpoint
-        String credentialsUrl = this.retrieveCredentialsUrl(platformResponse.getVersions());
+        String credentialsUrl = this.retrieveCredentialsUrl(versionsUrl);
 
-        // Register party
-        String credentialsTokenC = this.registerPartyCredentials(platformResponse.getToken(), backendUrl, roles,
+        // Register party using the validated tokenA
+        String credentialsTokenC = this.registerPartyCredentials(tokenA, backendUrl, roles,
                 HttpMethod.POST, credentialsUrl);
         if (credentialsTokenC == null) {
             return null;
@@ -698,13 +716,47 @@ public class OcnClient {
 
     private String retrieveCredentialsUrl(String versionsUrl) throws Exception {
         try {
+            // Step 1: Get the list of versions from the versions endpoint
+            ParameterizedTypeReference<OcpiResponse<List<Version>>> versionsResponseType = 
+                    new ParameterizedTypeReference<OcpiResponse<List<Version>>>() {};
 
-            VersionDetails versionDetails = getVersionDetails();
+            HttpHeaders headers = this.createHeadersAuthTokenA();
+            OcpiResponse<List<Version>> versionsResponse = this._call(versionsUrl, null, new HashMap<>(), headers,
+                    versionsResponseType, HttpMethod.GET, new ArrayList<>(), null);
+
+            if (versionsResponse == null || versionsResponse.getData() == null || versionsResponse.getData().isEmpty()) {
+                throw new Exception("Empty response from versions endpoint");
+            }
+
+            // Step 2: Find the 2.2.1 version URL
+            String versionDetailsUrl = null;
+            for (Version version : versionsResponse.getData()) {
+                if (VersionNumber.V_2_2_1.equals(version.getVersion())) {
+                    versionDetailsUrl = version.getUrl();
+                    break;
+                }
+            }
+
+            if (versionDetailsUrl == null) {
+                throw new Exception("Version 2.2.1 not found in versions list");
+            }
+
+            // Step 3: Get version details
+            ParameterizedTypeReference<OcpiResponse<VersionDetails>> detailsResponseType = 
+                    new ParameterizedTypeReference<OcpiResponse<VersionDetails>>() {};
+            OcpiResponse<VersionDetails> detailsResponse = this._call(versionDetailsUrl, null, new HashMap<>(), headers,
+                    detailsResponseType, HttpMethod.GET, new ArrayList<>(), null);
+
+            if (detailsResponse == null || detailsResponse.getData() == null) {
+                throw new Exception("Empty response from version details endpoint");
+            }
+
+            VersionDetails versionDetails = detailsResponse.getData();
             if (versionDetails.getEndpoints() == null) {
                 throw new Exception("No endpoints found in version details");
             }
 
-            // Find credentials endpoint
+            // Step 4: Find credentials endpoint
             for (Endpoint endpoint : versionDetails.getEndpoints()) {
                 if (ModuleID.CREDENTIALS.equals(endpoint.getIdentifier())
                         && "SENDER".equals(endpoint.getRole().toString())) {
