@@ -3,8 +3,6 @@ package com.banula.openlib.ocpi.custom.smartlocations;
 import com.banula.openlib.ocpi.model.Location;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,27 +16,21 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class SmartLocation extends Location {
     @JsonProperty("market_location_id")
-    @NotEmpty(message = "Marktlokation-ID cannot be empty")
     private String marketLocationId;
 
     @JsonProperty("metering_location_id")
-    @NotEmpty(message = "Messlokation-ID cannot be empty")
     private String meteringLocationId;
 
     @JsonProperty("dso_market_partner_id")
-    @NotEmpty(message = "Verteilnetzbetreiber Partner-ID cannot be empty")
     private String dsoMarketPartnerId;
 
     @JsonProperty("tso_market_partner_id")
-    @NotEmpty(message = "Übertragungsnetzbetreiber Partner-ID cannot be empty")
     private String tsoMarketPartnerId;
 
     @JsonProperty("mpo_market_partner_id")
-    @NotEmpty(message = "Messstellenbetreiber Partner-ID cannot be empty")
     private String mpoMarketPartnerId;
 
     @JsonProperty("metering_data_source")
-    @NotNull(message = "Metering data source cannot be null")
     private MeteringDataSource meteringDataSource;
 
     @JsonProperty("malo")
@@ -51,7 +43,6 @@ public class SmartLocation extends Location {
     private String messageQueueUrl;
 
     @JsonProperty("default_supplier")
-    @NotNull(message = "Default supplier cannot be null")
     private DefaultSupplier defaultSupplier;
 
     @JsonProperty("smart_location_state")
