@@ -786,7 +786,7 @@ public class OcnClient {
         for (Role role : roles) {
             credentialsRoles.add(createCredentialsRole(role));
         }
-        CredentialsDTO request = new CredentialsDTO(configuration.getTokenB(), backendUrl, credentialUrl,
+        CredentialsDTO request = new CredentialsDTO(configuration.getTokenB(), backendUrl, 
                 credentialsRoles);
         String base64RegistrationToken = Base64.getEncoder().encodeToString(registrationToken.getBytes());
 

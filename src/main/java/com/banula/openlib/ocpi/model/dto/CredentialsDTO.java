@@ -24,8 +24,6 @@ public class CredentialsDTO {
     @Size(max = 255, message = "URL must be at most 255 characters long")
     private String url;
 
-    private String credentialsEndpointUrl;
-
     @NotNull(message = "Roles must not be blank")
     @Valid
     private List<CredentialsRole> roles;
