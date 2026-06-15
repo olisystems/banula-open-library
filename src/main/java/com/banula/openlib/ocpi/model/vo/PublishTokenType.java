@@ -1,8 +1,13 @@
 package com.banula.openlib.ocpi.model.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.banula.openlib.ocpi.model.enums.TokenType;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * Defines the set of values that identify a token to which a Location might be
@@ -16,6 +21,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PublishTokenType {
 
     /**

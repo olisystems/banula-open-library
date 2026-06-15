@@ -1,5 +1,7 @@
 package com.banula.openlib.ocpi.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GeoLocationDTO {
 
     private String longitude;
