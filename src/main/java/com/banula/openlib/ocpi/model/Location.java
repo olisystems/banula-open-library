@@ -229,7 +229,7 @@ public class Location {
      * Default: true
      */
     @JsonProperty("charging_when_closed")
-    private Boolean chargingWhenClosed = true;
+    private Boolean chargingWhenClosed;
 
     /**
      * Links to images related to the location such as photos or logos.

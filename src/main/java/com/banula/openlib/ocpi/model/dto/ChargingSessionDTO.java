@@ -1,8 +1,8 @@
 package com.banula.openlib.ocpi.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.banula.openlib.ocpi.model.enums.AuthMethod;
 import com.banula.openlib.ocpi.model.enums.SessionStatus;
 import com.banula.openlib.ocpi.model.vo.CdrToken;
@@ -10,20 +10,27 @@ import com.banula.openlib.ocpi.model.vo.ChargingPeriod;
 import com.banula.openlib.ocpi.model.vo.Price;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChargingSessionDTO {
     @NotEmpty
     @Size(min = 1, max = 2)
