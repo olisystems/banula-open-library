@@ -1,24 +1,27 @@
 package com.banula.openlib.ocpi.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 import com.banula.openlib.ocn.client.OcnClient;
 import com.banula.openlib.ocpi.exception.OCPICustomException;
 import com.banula.openlib.ocpi.util.Constants;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OcpiErrorResponse {
     private int status_code;
     private String status_message;

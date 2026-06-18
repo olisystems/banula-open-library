@@ -1,9 +1,11 @@
 package com.banula.openlib.ocpi.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.banula.openlib.ocpi.model.enums.AllowedType;
 import com.banula.openlib.ocpi.model.vo.DisplayText;
 import com.banula.openlib.ocpi.model.vo.LocationReferences;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -13,6 +15,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthorizationInfo {
 
     @NotNull(message = "Allowed type must not be null")
