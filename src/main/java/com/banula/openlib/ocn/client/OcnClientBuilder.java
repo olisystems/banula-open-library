@@ -36,6 +36,11 @@ public class OcnClientBuilder {
         this.configuration.setTokenB(token);
         return this;
     }
+    
+    public OcnClientBuilder setTokenA(String token) {
+        this.configuration.setTokenA(token);
+        return this;
+    }
 
     public OcnClientBuilder setPrivateKey(String privateKey) {
         this.configuration.setPrivateKey(privateKey);

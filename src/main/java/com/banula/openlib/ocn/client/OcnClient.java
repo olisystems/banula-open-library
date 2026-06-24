@@ -8,19 +8,32 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.hc.client5.http.classic.HttpClient;
-import com.banula.openlib.ocpi.model.enums.Role;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.banula.openlib.ocn.Notary;
-import com.banula.openlib.ocn.model.*;
+import com.banula.openlib.ocn.model.BasicRole;
+import com.banula.openlib.ocn.model.CreatePlatformRequest;
+import com.banula.openlib.ocn.model.CreatePlatformResponse;
+import com.banula.openlib.ocn.model.OcnClientConfiguration;
+import com.banula.openlib.ocn.model.OcnCredential;
+import com.banula.openlib.ocn.model.ValuesToSign;
 import com.banula.openlib.ocpi.model.OcpiErrorResponse;
 import com.banula.openlib.ocpi.model.OcpiResponse;
+import com.banula.openlib.ocpi.model.Version;
+import com.banula.openlib.ocpi.model.VersionDetails;
 import com.banula.openlib.ocpi.model.dto.CredentialsDTO;
+import com.banula.openlib.ocpi.model.enums.ModuleID;
+import com.banula.openlib.ocpi.model.enums.Role;
+import com.banula.openlib.ocpi.model.enums.VersionNumber;
 import com.banula.openlib.ocpi.model.vo.BusinessDetails;
 import com.banula.openlib.ocpi.model.vo.CredentialsRole;
 import com.banula.openlib.ocpi.model.vo.Endpoint;
@@ -94,7 +107,7 @@ public class OcnClient {
             }
 
             verifyAndSetGeneratedTokenC(generatedTokenC);
-            OcnVersionDetails endpointResponse = this.getVersionDetails();
+            VersionDetails endpointResponse = this.getVersionDetails();
 
             log.info("OCN Node: Ocpi Version: {} | Endpoints: {}", endpointResponse.getVersion(),
                     endpointResponse.getEndpoints().size());
@@ -113,7 +126,6 @@ public class OcnClient {
             log.error("Error while registering party, Ocn Node CREDENTIALS endpoint returned a null tokenC");
         } else {
             configuration.setTokenC(tokenC);
-            configuration.setBase64TokenC(Base64.getEncoder().encodeToString(tokenC.getBytes()));
             log.info(String.format(
                     "%s updated successfully, you can set 'updating-party = false' to avoid future re-shaking hands",
                     configuration.getOcpiRoles().toString()));
@@ -126,20 +138,42 @@ public class OcnClient {
         ocnCredential.setCountryCode(configuration.getFromCountryCode());
         ocnCredential.setPartyId(configuration.getFromPartyId());
 
-        // Get registration token
-        String tokenA = this.getRegistrationToken();
+        // Create platform and get response
+        CreatePlatformResponse platformResponse = this.createPlatform();
+
+        // Get token A from platform response or use configured TokenA as fallback
+        String tokenA = platformResponse.getToken();
+        if (tokenA == null || tokenA.isBlank()) {
+            log.warn("OCN Node returned null/empty TokenA, using configured TokenA");
+            tokenA = configuration.getTokenA();
+        }
+        if (tokenA == null || tokenA.isBlank()) {
+            throw new Exception("TokenA is null or empty - cannot proceed with registration. " +
+                    "Please configure party.tokenA or ensure OCN Node returns a valid token.");
+        }
 
         // Save token A
         ocnCredential.setTokenA(tokenA);
+        configuration.setTokenA(tokenA);
 
-        // Register party
-        String credentialsTokenC = this.registerPartyCredentials(tokenA, backendUrl, roles, HttpMethod.POST);
+        // Get versions URL from response or construct default
+        String versionsUrl = platformResponse.getVersions();
+        if (versionsUrl == null || versionsUrl.isBlank()) {
+            versionsUrl = configuration.getNodeUrl() + "/ocpi/versions";
+            log.warn("OCN Node returned null/empty versions URL, using default: {}", versionsUrl);
+        }
+
+        // Retrieve credentials URL from versions endpoint
+        String credentialsUrl = this.retrieveCredentialsUrl(versionsUrl);
+
+        // Register party using the validated tokenA
+        String credentialsTokenC = this.registerPartyCredentials(tokenA, backendUrl, roles,
+                HttpMethod.POST, credentialsUrl);
         if (credentialsTokenC == null) {
             return null;
         }
-        // Set new tokenC
+        // Set and persist new tokenC
         configuration.setTokenC(credentialsTokenC);
-        configuration.setBase64TokenC(Base64.getEncoder().encodeToString(credentialsTokenC.getBytes()));
         ocnCredential.setTokenC(credentialsTokenC);
         ocnCredentialHandler.saveOcnCredential(ocnCredential);
 
@@ -154,15 +188,18 @@ public class OcnClient {
 
         // Get current tokenC
         String registrationToken = credentials.getTokenC();
+
+        // Retrieve credentials URL from versions endpoint
+        String credentialsUrl = this.retrieveCredentialsUrl(OcnEndpoints.VERSIONS.toString());
+
         // Update party
         String credentialsTokenC = this.registerPartyCredentials(registrationToken, backendUrl, roles,
-                HttpMethod.PUT);
+                HttpMethod.PUT, credentialsUrl);
         if (credentialsTokenC == null) {
             return null;
         }
         // Update tokenC
         configuration.setTokenC(credentialsTokenC);
-        configuration.setBase64TokenC(Base64.getEncoder().encodeToString(credentialsTokenC.getBytes()));
         credentials.setTokenC(credentialsTokenC);
         ocnCredentialHandler.saveOcnCredential(credentials);
 
@@ -458,49 +495,114 @@ public class OcnClient {
     }
 
     /**
+     * Retrieves a list of available OCPI versions from the OCN node
+     * 
+     * @return List of Version objects representing available OCPI versions and
+     *         their detail URLs
+     * @throws Exception if communication fails
+     */
+    public List<Version> getVersions() throws Exception {
+        try {
+            // Define the response type (a wrapper containing a list of versions)
+            ParameterizedTypeReference<OcpiResponse<List<Version>>> responseTypeRef = new ParameterizedTypeReference<OcpiResponse<List<Version>>>() {
+            };
+
+            // Make the HTTP request using TokenA for authorization
+            HttpHeaders headers = this.createHeadersAuthTokenA();
+            OcpiResponse<List<Version>> response = this._call(
+                    OcnEndpoints.VERSIONS,
+                    null,
+                    new HashMap<>(),
+                    headers,
+                    responseTypeRef,
+                    HttpMethod.GET,
+                    new ArrayList<>(),
+                    null);
+
+            // Return the versions from the response
+            if (response != null && response.getData() != null) {
+                return response.getData();
+            }
+            return new ArrayList<>();
+        } catch (Exception ex) {
+            log.error("Failed to retrieve OCPI versions: {}", ex.getMessage());
+            throw ex;
+        }
+    }
+
+    /**
      * Retrieves a list of available OCPI endpoints from the OCN node
      * 
      * @return List of Endpoint objects representing available OCPI modules and
      *         their URLs
      * @throws Exception if communication fails
      */
-    public OcnVersionDetails getVersionDetails() throws Exception {
+    public VersionDetails getVersionDetails() throws Exception {
         try {
-            // Create the URL for the endpoints resource
-            String url = String.format("%s/ocpi/2.2.1", configuration.getNodeUrl());
+            // Get versions list first
+            List<Version> versions = this.getVersions();
 
-            // Define the response type (a wrapper containing a list of endpoints)
-            ParameterizedTypeReference<OcpiResponse<OcnVersionDetails>> responseTypeRef = new ParameterizedTypeReference<OcpiResponse<OcnVersionDetails>>() {
+            // Find the 2.2.1 version URL
+            String versionDetailsUrl = null;
+            for (Version version : versions) {
+                if (version.getVersion() != null && VersionNumber.V_2_2_1.equals(version.getVersion())) {
+                    versionDetailsUrl = version.getUrl();
+                    break;
+                }
+            }
+
+            if (versionDetailsUrl == null) {
+                throw new Exception("Version 2.2.1 not found in versions list");
+            }
+
+            // Define the response type (a wrapper containing version details)
+            ParameterizedTypeReference<OcpiResponse<VersionDetails>> responseTypeRef = new ParameterizedTypeReference<OcpiResponse<VersionDetails>>() {
             };
 
-            // Make the HTTP request
-            HttpHeaders headers = this.createHeaders();
-            OcpiResponse<OcnVersionDetails> response = this._call(url, null, new HashMap<>(), headers,
+            // Make the HTTP request using TokenA for authorization
+            HttpHeaders headers = this.createHeadersAuthTokenA();
+            OcpiResponse<VersionDetails> response = this._call(versionDetailsUrl, null, new HashMap<>(), headers,
                     responseTypeRef, HttpMethod.GET, new ArrayList<>(), null);
 
             // Return the endpoints from the response
             if (response != null && response.getData() != null) {
                 return response.getData();
             }
-            return new OcnVersionDetails();
+            return new VersionDetails();
         } catch (Exception ex) {
             log.error("Failed to retrieve OCPI endpoints: {}", ex.getMessage());
             throw ex;
         }
     }
 
+    // By default use TokenC
     private HttpHeaders createHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Accept", "*/*");
-        headers.add("Authorization", String.format("Token %s", configuration.getTokenC()));
+        String base64TokenC = Base64.getEncoder().encodeToString(configuration.getTokenC().getBytes());
+        headers.add("Authorization", String.format("Token %s", base64TokenC));
         headers.set("X-Request-ID", UUID.randomUUID().toString());
         headers.set("X-Correlation-ID", UUID.randomUUID().toString());
         headers.set("OCPI-from-country-code", configuration.getFromCountryCode());
         headers.set("OCPI-from-party-id", configuration.getFromPartyId());
         headers.set("OCPI-to-country-code", configuration.getToCountryCode());
         headers.set("OCPI-to-party-id", configuration.getToPartyId());
-        headers.set("Authorization", "Token " + configuration.getBase64TokenC());
+        return headers;
+    }
+
+    private HttpHeaders createHeadersAuthTokenA() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Accept", "*/*");
+        String base64TokenA = Base64.getEncoder().encodeToString(configuration.getTokenA().getBytes());
+        headers.add("Authorization", String.format("Token %s", base64TokenA));
+        headers.set("X-Request-ID", UUID.randomUUID().toString());
+        headers.set("X-Correlation-ID", UUID.randomUUID().toString());
+        headers.set("OCPI-from-country-code", configuration.getFromCountryCode());
+        headers.set("OCPI-from-party-id", configuration.getFromPartyId());
+        headers.set("OCPI-to-country-code", configuration.getToCountryCode());
+        headers.set("OCPI-to-party-id", configuration.getToPartyId());
         return headers;
     }
 
@@ -562,8 +664,11 @@ public class OcnClient {
             ParameterizedTypeReference<OcpiResponse<CredentialsDTO>> responseType = new ParameterizedTypeReference<OcpiResponse<CredentialsDTO>>() {
             };
 
+            // Retrieve credentials URL from versions endpoint
+            String credentialsUrl = this.retrieveCredentialsUrl(OcnEndpoints.VERSIONS.toString());
+
             OcpiResponse<CredentialsDTO> response = this._call(
-                    OcnEndpoints.REGISTER_PARTY_CREDENTIALS,
+                    credentialsUrl,
                     null,
                     new HashMap<>(),
                     headers,
@@ -583,19 +688,22 @@ public class OcnClient {
         }
     }
 
-    private String getRegistrationToken() throws Exception {
-        List<OcnRegistrationRequest> request = List
-                .of(new OcnRegistrationRequest(configuration.getFromCountryCode(), configuration.getFromPartyId()));
+    private CreatePlatformResponse createPlatform() throws Exception {
+        List<BasicRole> roles = List
+                .of(new BasicRole(configuration.getFromPartyId(), configuration.getFromCountryCode()));
+        CreatePlatformRequest request = new CreatePlatformRequest();
+        request.setRoles(roles);
+
         String base64AdminKey = Base64.getEncoder().encodeToString(configuration.getAdminKey().getBytes());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Token " + base64AdminKey);
 
-        ParameterizedTypeReference<OcnRegistrationResponse> responseType = new ParameterizedTypeReference<OcnRegistrationResponse>() {
+        ParameterizedTypeReference<CreatePlatformResponse> responseType = new ParameterizedTypeReference<CreatePlatformResponse>() {
         };
-        OcnRegistrationResponse response = this._call(
-                OcnEndpoints.GENERATE_REGISTRATION_TOKEN,
+        CreatePlatformResponse response = this._call(
+                OcnEndpoints.CREATE_PLATFORM,
                 request,
                 new HashMap<>(),
                 headers,
@@ -603,7 +711,64 @@ public class OcnClient {
                 new ArrayList<>(),
                 null);
 
-        return response.getToken();
+        return response;
+    }
+
+    private String retrieveCredentialsUrl(String versionsUrl) throws Exception {
+        try {
+            // Step 1: Get the list of versions from the versions endpoint
+            ParameterizedTypeReference<OcpiResponse<List<Version>>> versionsResponseType = 
+                    new ParameterizedTypeReference<OcpiResponse<List<Version>>>() {};
+
+            HttpHeaders headers = this.createHeadersAuthTokenA();
+            OcpiResponse<List<Version>> versionsResponse = this._call(versionsUrl, null, new HashMap<>(), headers,
+                    versionsResponseType, HttpMethod.GET, new ArrayList<>(), null);
+
+            if (versionsResponse == null || versionsResponse.getData() == null || versionsResponse.getData().isEmpty()) {
+                throw new Exception("Empty response from versions endpoint");
+            }
+
+            // Step 2: Find the 2.2.1 version URL
+            String versionDetailsUrl = null;
+            for (Version version : versionsResponse.getData()) {
+                if (VersionNumber.V_2_2_1.equals(version.getVersion())) {
+                    versionDetailsUrl = version.getUrl();
+                    break;
+                }
+            }
+
+            if (versionDetailsUrl == null) {
+                throw new Exception("Version 2.2.1 not found in versions list");
+            }
+
+            // Step 3: Get version details
+            ParameterizedTypeReference<OcpiResponse<VersionDetails>> detailsResponseType = 
+                    new ParameterizedTypeReference<OcpiResponse<VersionDetails>>() {};
+            OcpiResponse<VersionDetails> detailsResponse = this._call(versionDetailsUrl, null, new HashMap<>(), headers,
+                    detailsResponseType, HttpMethod.GET, new ArrayList<>(), null);
+
+            if (detailsResponse == null || detailsResponse.getData() == null) {
+                throw new Exception("Empty response from version details endpoint");
+            }
+
+            VersionDetails versionDetails = detailsResponse.getData();
+            if (versionDetails.getEndpoints() == null) {
+                throw new Exception("No endpoints found in version details");
+            }
+
+            // Step 4: Find credentials endpoint
+            for (Endpoint endpoint : versionDetails.getEndpoints()) {
+                if (ModuleID.CREDENTIALS.equals(endpoint.getIdentifier())
+                        && "SENDER".equals(endpoint.getRole().toString())) {
+                    return endpoint.getUrl();
+                }
+            }
+
+            throw new Exception("Credentials endpoint not found in version details");
+        } catch (Exception e) {
+            log.error("Error retrieving credentials URL from versions endpoint: " + e.getMessage());
+            throw e;
+        }
     }
 
     private CredentialsRole createCredentialsRole(Role role) {
@@ -615,13 +780,14 @@ public class OcnClient {
     }
 
     public String registerPartyCredentials(String registrationToken, String backendUrl, List<Role> roles,
-            HttpMethod httpMethod) throws Exception {
+            HttpMethod httpMethod, String credentialUrl) throws Exception {
 
         List<CredentialsRole> credentialsRoles = new ArrayList<>();
         for (Role role : roles) {
             credentialsRoles.add(createCredentialsRole(role));
         }
-        CredentialsDTO request = new CredentialsDTO(configuration.getTokenB(), backendUrl, credentialsRoles);
+        CredentialsDTO request = new CredentialsDTO(configuration.getTokenB(), backendUrl, 
+                credentialsRoles);
         String base64RegistrationToken = Base64.getEncoder().encodeToString(registrationToken.getBytes());
 
         HttpHeaders headers = new HttpHeaders();
@@ -632,7 +798,7 @@ public class OcnClient {
         };
         try {
             OcpiResponse<CredentialsDTO> response = this._call(
-                    OcnEndpoints.REGISTER_PARTY_CREDENTIALS,
+                    credentialUrl,
                     request,
                     new HashMap<>(),
                     headers,

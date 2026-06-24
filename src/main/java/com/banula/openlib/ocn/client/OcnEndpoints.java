@@ -1,24 +1,25 @@
 package com.banula.openlib.ocn.client;
 
 public enum OcnEndpoints {
-    // Registration
-    GENERATE_REGISTRATION_TOKEN("/admin/generate-registration-token"),
+    // Admin endpoints
+    CREATE_PLATFORM("/admin/platform"),
     DELETE_PARTY_CREDENTIALS("/admin/party"),
-    REGISTER_PARTY_CREDENTIALS("/ocpi/2.2.1/credentials"),
 
-    // CUSTOM MODULES
-    // SCSP
+    // OCPI MAIN ENDPOINTS
+    VERSIONS("/ocpi/versions"),
+
+    // OCPI CUSTOM MODULES
     SCSP_CALCULATE_FLEXIBILITY("/ocpi/custom/receiver/flexibility"),
     CUSTOM_SMART_LOCATIONS("ocpi/custom/smartlocations");
 
-    private String url;
+    private String mainUrl;
 
-    private OcnEndpoints(String endpointUrl) {
-        this.url = endpointUrl;
+    private OcnEndpoints(String mainUrl) {
+        this.mainUrl = mainUrl;
     }
 
     @Override
     public String toString() {
-        return this.url;
+        return this.mainUrl;
     }
 }

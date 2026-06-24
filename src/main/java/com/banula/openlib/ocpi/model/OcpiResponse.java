@@ -1,19 +1,22 @@
 package com.banula.openlib.ocpi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+import org.springframework.http.HttpHeaders;
+
 import com.banula.openlib.ocn.client.OcnClient;
 import com.banula.openlib.ocpi.exception.OCPICustomException;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpHeaders;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 @Data
 @AllArgsConstructor
@@ -22,6 +25,7 @@ public class OcpiResponse<T> {
     private T data;
     private int status_code;
     private String status_message;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String ocn_signature;
 
     @JsonDeserialize(using = OCPILocalDateTimeDeserializer.class)

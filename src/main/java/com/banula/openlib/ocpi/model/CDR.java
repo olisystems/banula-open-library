@@ -196,7 +196,6 @@ public class CDR {
      */
     @JsonProperty("total_energy")
     @NotNull(message = "Total energy cannot be null")
-    @Digits(integer = Integer.MAX_VALUE, fraction = 4, message = "Invalid total energy value")
     private Float totalEnergy;
 
     /**

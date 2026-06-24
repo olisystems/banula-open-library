@@ -140,5 +140,6 @@ public class Tariff {
     @JsonProperty("last_updated")
     @JsonDeserialize(using = OCPILocalDateTimeDeserializer.class)
     @JsonSerialize(using = OCPILocalDateTimeSerializer.class)
+    @NotNull(message = "Last updated time cannot be null")
     private LocalDateTime lastUpdated;
 }

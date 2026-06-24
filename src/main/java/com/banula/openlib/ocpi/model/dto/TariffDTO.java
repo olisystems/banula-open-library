@@ -73,6 +73,7 @@ public class TariffDTO {
     // Charging.")
     private EnergyMix energyMix;
 
+    @NotNull(message = "Last updated time cannot be null")
     @JsonProperty("last_updated")
     @JsonDeserialize(using = OCPILocalDateTimeDeserializer.class)
     @JsonSerialize(using = OCPILocalDateTimeSerializer.class)

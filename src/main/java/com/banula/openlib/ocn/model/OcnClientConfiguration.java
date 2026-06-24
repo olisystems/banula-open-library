@@ -13,9 +13,9 @@ public class OcnClientConfiguration {
     private String fromCountryCode;
     private String toPartyId;
     private String toCountryCode;
+    private String tokenA;
     private String tokenB;
     private String tokenC;
-    private String base64TokenC;
     private String privateKey;
     private String nodeUrl;
     private String adminKey;

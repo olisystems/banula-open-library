@@ -154,6 +154,7 @@ public class PlatformClientOcpiComplianceTest {
                 List.of(new PriceComponent(TariffDimensionType.FLAT, 0.5f, 1)))));
         EnergyMix energyMix = new EnergyMix(true);
         dto.setEnergyMix(energyMix);
+        dto.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         try {
             helper.validateOcpiCompliance(dto, HttpMethod.PUT);
         } catch (Exception e) {
