@@ -1,9 +1,11 @@
 package com.banula.openlib.ocpi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.banula.openlib.ocpi.model.enums.ChargingProfileResultType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class AbstractProfileResult {
 
     @JsonProperty("result")

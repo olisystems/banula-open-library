@@ -8,6 +8,7 @@ import com.banula.openlib.ocpi.model.enums.WhitelistType;
 import com.banula.openlib.ocpi.model.vo.EnergyContract;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -25,6 +26,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TokenDTO {
     @NotEmpty(message = "Country code must not be blank")
     @Size(min = 1, max = 2, message = "Country code must be between 1 and 2 characters")

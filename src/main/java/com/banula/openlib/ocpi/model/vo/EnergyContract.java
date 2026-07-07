@@ -1,6 +1,8 @@
 package com.banula.openlib.ocpi.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -15,6 +17,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EnergyContract {
 
     /**

@@ -1,15 +1,21 @@
 package com.banula.openlib.ocpi.model.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.banula.openlib.ocpi.model.enums.EnergySourceCategory;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @ToString
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EnergySource {
 
     /**

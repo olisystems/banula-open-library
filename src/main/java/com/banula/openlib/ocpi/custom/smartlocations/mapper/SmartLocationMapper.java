@@ -1,15 +1,15 @@
 package com.banula.openlib.ocpi.custom.smartlocations.mapper;
 
-import com.banula.openlib.ocpi.custom.smartlocations.SmartLocation;
-import com.banula.openlib.ocpi.custom.smartlocations.dto.SmartLocationDTO;
-import com.banula.openlib.ocpi.model.dto.GeoLocationDTO;
-import com.banula.openlib.ocpi.model.vo.GeoLocation;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
+
+import com.banula.openlib.ocpi.custom.smartlocations.SmartLocation;
+import com.banula.openlib.ocpi.custom.smartlocations.dto.SmartLocationDTO;
+import com.banula.openlib.ocpi.model.dto.GeoLocationDTO;
+import com.banula.openlib.ocpi.model.vo.GeoLocation;
 
 public class SmartLocationMapper {
 

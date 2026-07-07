@@ -1,6 +1,8 @@
 package com.banula.openlib.ocpi.model.vo;
 
 import com.banula.openlib.ocpi.model.enums.EnvironmentalImpactCategory;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -12,6 +14,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EnvironmentalImpact {
 
     /**

@@ -1,17 +1,19 @@
 package com.banula.openlib.ocpi.model.vo;
 
+import java.time.LocalDateTime;
+
+import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
+import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
-import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * Specifies one exceptional period for opening or access hours.
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExceptionalPeriod {
 
     /**

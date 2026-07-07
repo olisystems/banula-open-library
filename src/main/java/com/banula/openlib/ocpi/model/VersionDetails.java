@@ -1,8 +1,12 @@
 package com.banula.openlib.ocpi.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+
 import com.banula.openlib.ocpi.model.enums.VersionNumber;
 import com.banula.openlib.ocpi.model.vo.Endpoint;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -10,12 +14,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
-
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class VersionDetails {
 
     /**

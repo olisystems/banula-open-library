@@ -17,6 +17,7 @@ import com.banula.openlib.ocpi.model.vo.PublishTokenType;
 import com.banula.openlib.ocpi.util.GeoLocationDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeDeserializer;
 import com.banula.openlib.ocpi.util.OCPILocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -46,6 +47,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Location {
 
     /**
@@ -229,7 +231,7 @@ public class Location {
      * Default: true
      */
     @JsonProperty("charging_when_closed")
-    private Boolean chargingWhenClosed = true;
+    private Boolean chargingWhenClosed;
 
     /**
      * Links to images related to the location such as photos or logos.
