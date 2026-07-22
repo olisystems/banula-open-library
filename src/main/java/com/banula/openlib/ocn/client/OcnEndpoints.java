@@ -3,7 +3,7 @@ package com.banula.openlib.ocn.client;
 public enum OcnEndpoints {
     // Admin endpoints
     CREATE_PLATFORM("/admin/platform"),
-    DELETE_PARTY_CREDENTIALS("/admin/party"),
+    DELETE_PARTY_CREDENTIALS("/admin/platform-by-party"),
 
     // OCPI MAIN ENDPOINTS
     VERSIONS("/ocpi/versions"),
