@@ -12,35 +12,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreatePlatformResponse {
-    /** Legacy flat token field (older node responses). */
-    @ToString.Exclude
-    private String token;
-    /** Legacy flat versions URL field (older node responses). */
-    private String versions;
-    /** Nested auth from ocn-node-v2 PlatformEntity responses. */
     @ToString.Exclude
     private Auth auth;
-    /** versionsUrl from ocn-node-v2 PlatformEntity responses. */
     private String versionsUrl;
 
-    /** Compatibility constructor for legacy flat response fields. */
-    public CreatePlatformResponse(String token, String versions) {
-        this.token = token;
-        this.versions = versions;
-    }
-
-    public String getToken() {
-        if (token != null && !token.isBlank()) {
-            return token;
-        }
+    public String getTokenA() {
         return auth != null ? auth.getTokenA() : null;
-    }
-
-    public String getVersions() {
-        if (versions != null && !versions.isBlank()) {
-            return versions;
-        }
-        return versionsUrl;
     }
 
     @Data
