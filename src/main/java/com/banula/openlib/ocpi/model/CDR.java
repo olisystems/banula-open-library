@@ -1,5 +1,6 @@
 package com.banula.openlib.ocpi.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -198,7 +199,7 @@ public class CDR {
      */
     @JsonProperty("total_energy")
     @NotNull(message = "Total energy cannot be null")
-    private Float totalEnergy;
+    private BigDecimal totalEnergy;
 
     /**
      * Total sum of all the cost of all the energy used, in the specified currency.

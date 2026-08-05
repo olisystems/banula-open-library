@@ -1,5 +1,7 @@
 package com.banula.openlib.ocpi.model.vo;
 
+import java.math.BigDecimal;
+
 import com.banula.openlib.ocpi.model.enums.CdrDimensionType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,13 +34,13 @@ public class CdrDimension {
      */
     @JsonProperty("volume")
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
-    private Float volume;
+    private BigDecimal volume;
 
     public void setType(CdrDimensionType type) {
         this.type = type;
     }
 
-    public void setVolume(Float volume) {
+    public void setVolume(BigDecimal volume) {
         this.volume = volume;
     }
 
