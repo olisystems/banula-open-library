@@ -1,5 +1,6 @@
 package com.banula.openlib.ocpi.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class ChargingSession {
     @JsonDeserialize(using = OCPILocalDateTimeDeserializer.class)
     @JsonSerialize(using = OCPILocalDateTimeSerializer.class)
     private LocalDateTime endDateTime;
-    private Float kwh;
+    private BigDecimal kwh;
     private CdrToken cdrToken;
     private AuthMethod authMethod;
     private String authorizationReference;

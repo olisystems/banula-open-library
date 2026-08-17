@@ -46,14 +46,14 @@ Add the following dependency to your project's `pom.xml`:
 <dependency>
     <groupId>energy.oli</groupId>
     <artifactId>banula-open-library</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.7</version>
 </dependency>
 ```
 
 For Gradle users, add to your `build.gradle`:
 
 ```groovy
-implementation 'energy.oli:banula-open-library:1.0.3'
+implementation 'energy.oli:banula-open-library:1.1.7'
 ```
 
 ## Quick Start

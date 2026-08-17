@@ -1,5 +1,6 @@
 package com.banula.openlib.ocpi.model.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class ChargingSessionDTO {
     @NotNull
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     @JsonProperty("kwh")
-    private Float kwh;
+    private BigDecimal kwh;
     @NotNull
     @JsonProperty("cdr_token")
     @Valid
