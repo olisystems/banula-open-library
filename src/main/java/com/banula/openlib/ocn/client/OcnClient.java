@@ -142,7 +142,7 @@ public class OcnClient {
         CreatePlatformResponse platformResponse = this.createPlatform();
 
         // Get token A from platform response or use configured TokenA as fallback
-        String tokenA = platformResponse.getToken();
+        String tokenA = platformResponse.getTokenA();
         if (tokenA == null || tokenA.isBlank()) {
             log.warn("OCN Node returned null/empty TokenA, using configured TokenA");
             tokenA = configuration.getTokenA();
@@ -157,7 +157,7 @@ public class OcnClient {
         configuration.setTokenA(tokenA);
 
         // Get versions URL from response or construct default
-        String versionsUrl = platformResponse.getVersions();
+        String versionsUrl = platformResponse.getVersionsUrl();
         if (versionsUrl == null || versionsUrl.isBlank()) {
             versionsUrl = configuration.getNodeUrl() + "/ocpi/versions";
             log.warn("OCN Node returned null/empty versions URL, using default: {}", versionsUrl);
