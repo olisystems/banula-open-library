@@ -152,7 +152,7 @@ public class PlatformClientOcpiComplianceTest {
         TariffDTO dto = new TariffDTO();
         dto.setCurrency("EUR");
         dto.setElements(List.of(new TariffElement(
-                List.of(new PriceComponent(TariffDimensionType.FLAT, 0.5f, 1)))));
+                List.of(new PriceComponent(TariffDimensionType.FLAT, new BigDecimal("0.5"), 1)))));
         EnergyMix energyMix = new EnergyMix(true);
         dto.setEnergyMix(energyMix);
         dto.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
