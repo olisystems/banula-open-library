@@ -1,6 +1,6 @@
 # Banula Open Library
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.my-oli/banula-open-library/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.my-oli/banula-open-library)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/energy.oli/banula-open-library/badge.svg)](https://maven-badges.herokuapp.com/maven-central/energy.oli/banula-open-library)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Introduction
@@ -44,16 +44,16 @@ Add the following dependency to your project's `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>com.my-oli</groupId>
+    <groupId>energy.oli</groupId>
     <artifactId>banula-open-library</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.7</version>
 </dependency>
 ```
 
 For Gradle users, add to your `build.gradle`:
 
 ```groovy
-implementation 'com.my-oli:banula-open-library:1.0.3'
+implementation 'energy.oli:banula-open-library:1.1.7'
 ```
 
 ## Quick Start

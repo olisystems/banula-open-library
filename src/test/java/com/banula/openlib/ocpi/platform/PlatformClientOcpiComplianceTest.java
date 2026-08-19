@@ -12,6 +12,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -205,7 +206,7 @@ public class PlatformClientOcpiComplianceTest {
                 .build());
         dto.setChargingPeriods(List.of());
         dto.setTotalCost(new Price(0.0f));
-        dto.setTotalEnergy(1.0f);
+        dto.setTotalEnergy(BigDecimal.valueOf(1.0));
         dto.setTotalTime(0.5f);
         dto.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));
         try {

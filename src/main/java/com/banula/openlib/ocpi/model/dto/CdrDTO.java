@@ -1,5 +1,6 @@
 package com.banula.openlib.ocpi.model.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -106,7 +107,7 @@ public class CdrDTO {
 
     @NotNull(message = "Total energy must not be blank")
     @JsonProperty("total_energy")
-    private Float totalEnergy;
+    private BigDecimal totalEnergy;
 
     @JsonProperty("total_energy_cost")
     @Valid

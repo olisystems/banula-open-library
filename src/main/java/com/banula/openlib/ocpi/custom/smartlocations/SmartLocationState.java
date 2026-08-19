@@ -6,5 +6,6 @@ public enum SmartLocationState {
     ENRICHED,
     VERIFIED,
     INVALID,
-    ARCHIVED
+    ARCHIVED,
+    ACTIVE
 }
