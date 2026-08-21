@@ -205,7 +205,7 @@ public class PlatformClientOcpiComplianceTest {
                 .connectorPowerType(PowerType.AC_1_PHASE)
                 .build());
         dto.setChargingPeriods(List.of());
-        dto.setTotalCost(new Price(0.0f));
+        dto.setTotalCost(new Price(BigDecimal.ZERO));
         dto.setTotalEnergy(BigDecimal.valueOf(1.0));
         dto.setTotalTime(0.5f);
         dto.setLastUpdated(LocalDateTime.now(ZoneOffset.UTC));

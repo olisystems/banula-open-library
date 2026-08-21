@@ -1,5 +1,7 @@
 package com.banula.openlib.ocpi.model.vo;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,11 +17,11 @@ import lombok.ToString;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Price {
 
-    public Price(float exclVat) {
+    public Price(BigDecimal exclVat) {
         this.exclVat = exclVat;
     }
 
-    public Price(float exclVat, float inclVat) {
+    public Price(BigDecimal exclVat, BigDecimal inclVat) {
         this.exclVat = exclVat;
         this.inclVat = inclVat;
     }
@@ -30,13 +32,13 @@ public class Price {
     @Digits(integer = Integer.MAX_VALUE, fraction = 4, message = "Invalid price format for exclVat.")
     @NotNull(message = "ExclVat cannot be null.")
     @JsonProperty("excl_vat")
-    private Float exclVat;
+    private BigDecimal exclVat;
 
     /**
      * Price/Cost including VAT.
      */
     @Digits(integer = Integer.MAX_VALUE, fraction = 4, message = "Invalid price format for inclVat.")
     @JsonProperty("incl_vat")
-    private Float inclVat;
+    private BigDecimal inclVat;
 
 }
