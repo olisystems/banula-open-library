@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -36,7 +37,9 @@ public class MongoConfig {
     public MongoCustomConversions customConversions() {
         return new MongoCustomConversions(List.of(
                 new LocalDateTimeToDateConverter(),
-                new DateToLocalDateTimeConverter()));
+                new DateToLocalDateTimeConverter(),
+                new LocalDateToDateConverter(),
+                new DateToLocalDateConverter()));
     }
 
     /**
@@ -95,6 +98,33 @@ public class MongoConfig {
         @Override
         public LocalDateTime convert(Date source) {
             return LocalDateTime.ofInstant(source.toInstant(), ZoneOffset.UTC);
+        }
+    }
+
+    /**
+     * Converts LocalDate to Date by pinning it to midnight UTC.
+     *
+     * <p>
+     * Without this converter Spring Data falls back to {@code Jsr310Converters},
+     * which pins to {@link java.time.ZoneId#systemDefault()}: a JVM running on
+     * Europe/Berlin would store {@code 2026-08-24} as {@code 2026-08-23T22:00:00Z}
+     * and any UTC reader would read the day back as {@code 2026-08-23}.
+     */
+    static class LocalDateToDateConverter implements Converter<LocalDate, Date> {
+        @Override
+        public Date convert(LocalDate source) {
+            return Date.from(source.atStartOfDay(ZoneOffset.UTC).toInstant());
+        }
+    }
+
+    /**
+     * Converts Date to LocalDate using UTC, mirroring
+     * {@link LocalDateToDateConverter}.
+     */
+    static class DateToLocalDateConverter implements Converter<Date, LocalDate> {
+        @Override
+        public LocalDate convert(Date source) {
+            return LocalDate.ofInstant(source.toInstant(), ZoneOffset.UTC);
         }
     }
 }
