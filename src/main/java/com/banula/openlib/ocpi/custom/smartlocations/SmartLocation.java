@@ -1,7 +1,13 @@
 package com.banula.openlib.ocpi.custom.smartlocations;
 
 import com.banula.openlib.ocpi.model.Location;
+import com.banula.openlib.ocpi.util.OCPILocalDateDeserializer;
+import com.banula.openlib.ocpi.util.OCPILocalDateSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,4 +53,14 @@ public class SmartLocation extends Location {
 
     @JsonProperty("smart_location_state")
     private SmartLocationState smartLocationState;
+
+    @JsonProperty("active_first_day")
+    @JsonSerialize(using = OCPILocalDateSerializer.class)
+    @JsonDeserialize(using = OCPILocalDateDeserializer.class)
+    private LocalDate activeFirstDay;
+
+    @JsonProperty("active_last_day")
+    @JsonSerialize(using = OCPILocalDateSerializer.class)
+    @JsonDeserialize(using = OCPILocalDateDeserializer.class)
+    private LocalDate activeLastDay;
 }

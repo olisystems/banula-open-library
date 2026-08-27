@@ -6,6 +6,7 @@ import com.banula.openlib.ocpi.custom.smartlocations.SmartLocation;
 import com.banula.openlib.ocpi.model.Location;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,6 +22,8 @@ class ModelPatcherUtilTest {
         incomplete.setMalo("NEW_MALO");
         incomplete.setSmartMeterId("NEW_SMART_METER");
         incomplete.setMeteringDataSource(MeteringDataSource.CONTROL_BACKEND);
+        incomplete.setActiveFirstDay(LocalDate.of(2026, 8, 24));
+        incomplete.setActiveLastDay(LocalDate.of(2026, 8, 26));
         incomplete.setDefaultSupplier(DefaultSupplier.builder()
                 .supplierMarketPartnerId("SUPPLIER")
                 .bkvId("BKV")
@@ -35,6 +38,24 @@ class ModelPatcherUtilTest {
         assertEquals("NEW_SMART_METER", existing.getSmartMeterId());
         assertEquals(MeteringDataSource.CONTROL_BACKEND, existing.getMeteringDataSource());
         assertEquals("SUPPLIER", existing.getDefaultSupplier().getSupplierMarketPartnerId());
+        assertEquals(LocalDate.of(2026, 8, 24), existing.getActiveFirstDay());
+        assertEquals(LocalDate.of(2026, 8, 26), existing.getActiveLastDay());
+    }
+
+    @Test
+    void smartLocationPatcher_cannotClearActivationWindow() throws IllegalAccessException {
+        SmartLocation existing = buildSmartLocation(false, "MALO", "SMART_METER");
+        existing.setActiveFirstDay(LocalDate.of(2026, 8, 24));
+        existing.setActiveLastDay(LocalDate.of(2026, 8, 26));
+
+        SmartLocation incomplete = new SmartLocation();
+        incomplete.setMalo("OTHER_MALO");
+
+        ModelPatcherUtil.smartLocationPatcher(existing, incomplete);
+
+        // The patcher copies non-null values only, so nulls never clear a field.
+        assertEquals(LocalDate.of(2026, 8, 24), existing.getActiveFirstDay());
+        assertEquals(LocalDate.of(2026, 8, 26), existing.getActiveLastDay());
     }
 
     @Test

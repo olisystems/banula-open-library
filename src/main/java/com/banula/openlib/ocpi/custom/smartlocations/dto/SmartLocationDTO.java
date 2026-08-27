@@ -5,7 +5,13 @@ import com.banula.openlib.ocpi.custom.smartlocations.MeteringDataSource;
 import com.banula.openlib.ocpi.custom.smartlocations.SmartLocationState;
 import com.banula.openlib.ocpi.custom.smartlocations.validations.SmartLocationCreateGroup;
 import com.banula.openlib.ocpi.model.dto.LocationDTO;
+import com.banula.openlib.ocpi.util.OCPILocalDateDeserializer;
+import com.banula.openlib.ocpi.util.OCPILocalDateSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.time.LocalDate;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -63,4 +69,14 @@ public class SmartLocationDTO extends LocationDTO {
 
     @JsonProperty("smart_location_state")
     private SmartLocationState smartLocationState;
+
+    @JsonProperty("active_first_day")
+    @JsonSerialize(using = OCPILocalDateSerializer.class)
+    @JsonDeserialize(using = OCPILocalDateDeserializer.class)
+    private LocalDate activeFirstDay;
+
+    @JsonProperty("active_last_day")
+    @JsonSerialize(using = OCPILocalDateSerializer.class)
+    @JsonDeserialize(using = OCPILocalDateDeserializer.class)
+    private LocalDate activeLastDay;
 }

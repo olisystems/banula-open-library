@@ -1,5 +1,7 @@
 package com.banula.openlib.ocpi.model.vo;
 
+import java.math.BigDecimal;
+
 import com.banula.openlib.ocpi.model.enums.TariffDimensionType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,7 +31,7 @@ public class PriceComponent {
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     @NotNull
     @JsonProperty("price")
-    private Float price;
+    private BigDecimal price;
 
     /**
      * Applicable VAT percentage for this tariff dimension. If omitted, no VAT is
@@ -39,7 +41,7 @@ public class PriceComponent {
      */
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     @JsonProperty("vat")
-    private Float vat;
+    private BigDecimal vat;
 
     /**
      * Minimum amount to be billed. This unit will be billed in this step_size
@@ -54,13 +56,13 @@ public class PriceComponent {
     @JsonProperty("step_size")
     private Integer stepSize;
 
-    public PriceComponent(TariffDimensionType type, Float price, Integer stepSize) {
+    public PriceComponent(TariffDimensionType type, BigDecimal price, Integer stepSize) {
         this.type = type;
         this.price = price;
         this.stepSize = stepSize;
     }
 
-    public PriceComponent(TariffDimensionType type, Float price, Integer stepSize, Float vat) {
+    public PriceComponent(TariffDimensionType type, BigDecimal price, Integer stepSize, BigDecimal vat) {
         this.type = type;
         this.price = price;
         this.stepSize = stepSize;
