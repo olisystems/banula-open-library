@@ -34,9 +34,7 @@ The Banula Open Library is a comprehensive Java library designed to simplify the
 
 ## Requirements
 
-- Java 17 or higher
-- Spring Boot 3.0.2 or compatible
-- Maven 3.6.3 or higher
+- Java, Spring Boot and Maven — see the versions declared in the project's `pom.xml`
 
 ## Installation
 
@@ -46,14 +44,14 @@ Add the following dependency to your project's `pom.xml`:
 <dependency>
     <groupId>energy.oli</groupId>
     <artifactId>banula-open-library</artifactId>
-    <version>1.2.2</version>
+    <version>LATEST_VERSION</version> <!-- see the Maven Central badge above -->
 </dependency>
 ```
 
 For Gradle users, add to your `build.gradle`:
 
 ```groovy
-implementation 'energy.oli:banula-open-library:1.2.2'
+implementation 'energy.oli:banula-open-library:LATEST_VERSION' // see the Maven Central badge above
 ```
 
 ## Quick Start
@@ -241,10 +239,7 @@ Before deploying, ensure you have:
 
 ### Deployment Steps
 
-1. **Update the version** in `pom.xml`:
-   ```xml
-   <version>0.1.18</version> <!-- Increment from previous version -->
-   ```
+1. **Update the version** in `pom.xml` — increment it from the previously released version.
 
 2. **Deploy to Maven Central** using the `release` profile:
    ```bash
