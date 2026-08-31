@@ -139,10 +139,9 @@ public class SmartLocationActivationUtil {
      * only into each other: a window covering today activates, a window that has
      * passed archives, and a window still in the future waits as {@code VERIFIED}.
      * {@code PLAIN_OCPI}, {@code ENRICHED} and {@code INVALID} are manual decisions
-     * and always win. On a location with no window at all every state is left as it
-     * is — which is what keeps a hand-picked {@code ARCHIVED} sticky — except
-     * {@code ACTIVE}, which is only ever derived from a window and therefore falls
-     * back to {@code VERIFIED}.
+     * and always win. {@code ACTIVE} and {@code ARCHIVED}, by contrast, are never
+     * set by hand — they are derived from the window and nothing else, so a
+     * location that has no window at all falls back to {@code VERIFIED}.
      */
     public static SmartLocationState resolveState(SmartLocation location, LocalDate today) {
         if (location == null) {
@@ -155,10 +154,11 @@ public class SmartLocationActivationUtil {
             return current;
         }
 
-        // No window at all: a hand-picked ARCHIVED stays sticky, but ACTIVE cannot
-        // survive on its own — it is only ever derived from a window.
+        // No window at all: neither ACTIVE nor ARCHIVED can survive on their own,
+        // because both are derived from a window and nothing else. Only VERIFIED is
+        // left, which is exactly where a location waits until a window is given.
         if (!hasActivationWindow(location)) {
-            return current == SmartLocationState.ACTIVE ? SmartLocationState.VERIFIED : current;
+            return SmartLocationState.VERIFIED;
         }
 
         if (isWithinActiveWindow(location, today)) {

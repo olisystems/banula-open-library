@@ -200,10 +200,10 @@ class SmartLocationActivationUtilTest {
     }
 
     @Test
-    void resolveState_shouldKeepArchived_whenItHasNoWindow() {
+    void resolveState_shouldDropArchivedToVerified_whenItHasNoWindow() {
         SmartLocation location = window(null, null, SmartLocationState.ARCHIVED);
 
-        assertEquals(SmartLocationState.ARCHIVED, SmartLocationActivationUtil.resolveState(location, TODAY));
+        assertEquals(SmartLocationState.VERIFIED, SmartLocationActivationUtil.resolveState(location, TODAY));
     }
 
     @Test
