@@ -32,9 +32,9 @@ class SmartLocationActivationUtilTest {
     }
 
     @Test
-    void hasActivationWindow_shouldRequireBothDays() {
+    void hasActivationWindow_shouldRequireOnlyTheFirstDay() {
         assertFalse(SmartLocationActivationUtil.hasActivationWindow(window(null, null)));
-        assertFalse(SmartLocationActivationUtil.hasActivationWindow(window(TODAY, null)));
+        assertTrue(SmartLocationActivationUtil.hasActivationWindow(window(TODAY, null)));
         assertFalse(SmartLocationActivationUtil.hasActivationWindow(window(null, TODAY)));
         assertTrue(SmartLocationActivationUtil.hasActivationWindow(window(TODAY, TODAY)));
         assertFalse(SmartLocationActivationUtil.hasActivationWindow(null));
@@ -44,6 +44,8 @@ class SmartLocationActivationUtilTest {
     void isWindowValid_shouldRejectInvertedWindow() {
         assertTrue(SmartLocationActivationUtil.isWindowValid(window(TODAY.minusDays(1), TODAY)));
         assertTrue(SmartLocationActivationUtil.isWindowValid(window(TODAY, TODAY)));
+        assertTrue(SmartLocationActivationUtil.isWindowValid(window(TODAY, null)));
+        assertFalse(SmartLocationActivationUtil.isWindowValid(window(null, TODAY)));
         assertFalse(SmartLocationActivationUtil.isWindowValid(window(TODAY, TODAY.minusDays(1))));
     }
 
@@ -71,9 +73,37 @@ class SmartLocationActivationUtilTest {
     }
 
     @Test
-    void isWithinActiveWindow_shouldReturnFalse_whenOnlyOneDayIsSet() {
-        assertFalse(SmartLocationActivationUtil.isWithinActiveWindow(window(TODAY, null), TODAY));
+    void isWithinActiveWindow_shouldNeverEnd_whenLastDayIsBlank() {
+        SmartLocation openEnded = window(TODAY, null);
+
+        assertTrue(SmartLocationActivationUtil.isWithinActiveWindow(openEnded, TODAY));
+        assertTrue(SmartLocationActivationUtil.isWithinActiveWindow(openEnded, TODAY.plusYears(5)));
+        assertFalse(SmartLocationActivationUtil.isWithinActiveWindow(openEnded, TODAY.minusDays(1)));
+    }
+
+    @Test
+    void isWithinActiveWindow_shouldReturnFalse_whenOnlyTheLastDayIsSet() {
         assertFalse(SmartLocationActivationUtil.isWithinActiveWindow(window(null, TODAY), TODAY));
+    }
+
+    @Test
+    void isWithinActiveWindow_dateOnlyForm_shouldMatchTheEntityForm() {
+        assertTrue(SmartLocationActivationUtil.isWithinActiveWindow(TODAY.minusDays(1), TODAY.plusDays(1), TODAY));
+        assertTrue(SmartLocationActivationUtil.isWithinActiveWindow(TODAY, null, TODAY));
+        assertTrue(SmartLocationActivationUtil.isWithinActiveWindow(TODAY.minusDays(30), null, TODAY));
+        assertFalse(SmartLocationActivationUtil.isWithinActiveWindow(TODAY.plusDays(1), null, TODAY));
+        assertFalse(SmartLocationActivationUtil.isWithinActiveWindow(null, TODAY, TODAY));
+        assertFalse(SmartLocationActivationUtil.isWithinActiveWindow(TODAY, TODAY, null));
+        assertFalse(SmartLocationActivationUtil.isWithinActiveWindow(TODAY.minusDays(10), TODAY.minusDays(5), TODAY));
+    }
+
+    @Test
+    void isWindowPassed_shouldOnlyBeTrue_forAClosedWindowThatEnded() {
+        assertTrue(SmartLocationActivationUtil.isWindowPassed(TODAY.minusDays(10), TODAY.minusDays(1), TODAY));
+        assertFalse(SmartLocationActivationUtil.isWindowPassed(TODAY.minusDays(10), TODAY, TODAY));
+        assertFalse(SmartLocationActivationUtil.isWindowPassed(TODAY.minusDays(10), null, TODAY));
+        assertFalse(SmartLocationActivationUtil.isWindowPassed(null, TODAY.minusDays(1), TODAY));
+        assertFalse(SmartLocationActivationUtil.isWindowPassed(TODAY.minusDays(10), TODAY.minusDays(1), null));
     }
 
     @Test
@@ -95,8 +125,8 @@ class SmartLocationActivationUtilTest {
     }
 
     @Test
-    void resolveState_shouldKeepVerifiedOutsideWindow() {
-        SmartLocation location = window(TODAY.minusDays(10), TODAY.minusDays(5), SmartLocationState.VERIFIED);
+    void resolveState_shouldKeepVerified_whenWindowHasNotStartedYet() {
+        SmartLocation location = window(TODAY.plusDays(5), TODAY.plusDays(10), SmartLocationState.VERIFIED);
 
         assertEquals(SmartLocationState.VERIFIED, SmartLocationActivationUtil.resolveState(location, TODAY));
     }
@@ -109,10 +139,89 @@ class SmartLocationActivationUtilTest {
     }
 
     @Test
-    void resolveState_shouldDemoteActiveOutsideWindow() {
+    void resolveState_shouldArchiveActive_whenBothDaysAreInThePast() {
         SmartLocation location = window(TODAY.minusDays(10), TODAY.minusDays(5), SmartLocationState.ACTIVE);
 
+        assertEquals(SmartLocationState.ARCHIVED, SmartLocationActivationUtil.resolveState(location, TODAY));
+    }
+
+    @Test
+    void resolveState_shouldArchiveVerified_whenBothDaysAreInThePast() {
+        SmartLocation location = window(TODAY.minusDays(10), TODAY.minusDays(5), SmartLocationState.VERIFIED);
+
+        assertEquals(SmartLocationState.ARCHIVED, SmartLocationActivationUtil.resolveState(location, TODAY));
+    }
+
+    @Test
+    void resolveState_shouldArchiveOnTheDayAfterTheWindowEnds() {
+        SmartLocation location = window(TODAY.minusDays(10), TODAY, SmartLocationState.ACTIVE);
+
+        assertEquals(SmartLocationState.ACTIVE, SmartLocationActivationUtil.resolveState(location, TODAY));
+        assertEquals(SmartLocationState.ARCHIVED,
+                SmartLocationActivationUtil.resolveState(location, TODAY.plusDays(1)));
+    }
+
+    @Test
+    void resolveState_shouldActivateOpenEndedWindow_fromItsFirstDayOnwards() {
+        SmartLocation location = window(TODAY, null, SmartLocationState.VERIFIED);
+
+        assertEquals(SmartLocationState.ACTIVE, SmartLocationActivationUtil.resolveState(location, TODAY));
+        assertEquals(SmartLocationState.ACTIVE,
+                SmartLocationActivationUtil.resolveState(location, TODAY.plusYears(3)));
+    }
+
+    @Test
+    void resolveState_shouldKeepVerified_whenOpenEndedWindowHasNotStarted() {
+        SmartLocation location = window(TODAY.plusDays(1), null, SmartLocationState.VERIFIED);
+
         assertEquals(SmartLocationState.VERIFIED, SmartLocationActivationUtil.resolveState(location, TODAY));
+    }
+
+    /**
+     * The reversibility requirement: a last day entered by mistake archives the
+     * location, and clearing it again brings the location straight back to ACTIVE.
+     */
+    @Test
+    void resolveState_shouldReviveArchived_whenTheLastDayIsCleared() {
+        SmartLocation location = window(TODAY.minusDays(10), TODAY.minusDays(1), SmartLocationState.VERIFIED);
+        assertEquals(SmartLocationState.ARCHIVED, SmartLocationActivationUtil.resolveState(location, TODAY));
+
+        location.setSmartLocationState(SmartLocationState.ARCHIVED);
+        location.setActiveLastDay(null);
+
+        assertEquals(SmartLocationState.ACTIVE, SmartLocationActivationUtil.resolveState(location, TODAY));
+    }
+
+    @Test
+    void resolveState_shouldReviveArchived_whenTheWindowIsExtendedOverToday() {
+        SmartLocation location = window(TODAY.minusDays(10), TODAY.plusDays(5), SmartLocationState.ARCHIVED);
+
+        assertEquals(SmartLocationState.ACTIVE, SmartLocationActivationUtil.resolveState(location, TODAY));
+    }
+
+    @Test
+    void resolveState_shouldKeepArchived_whenItHasNoWindow() {
+        SmartLocation location = window(null, null, SmartLocationState.ARCHIVED);
+
+        assertEquals(SmartLocationState.ARCHIVED, SmartLocationActivationUtil.resolveState(location, TODAY));
+    }
+
+    @Test
+    void resolveState_shouldKeepArchived_whenTheWindowIsStillInThePast() {
+        SmartLocation location = window(TODAY.minusDays(10), TODAY.minusDays(5), SmartLocationState.ARCHIVED);
+
+        assertEquals(SmartLocationState.ARCHIVED, SmartLocationActivationUtil.resolveState(location, TODAY));
+    }
+
+    @Test
+    void resolveState_shouldNeverMove_whenTheWindowIsInverted() {
+        for (SmartLocationState state : List.of(SmartLocationState.VERIFIED, SmartLocationState.ACTIVE,
+                SmartLocationState.ARCHIVED)) {
+            assertEquals(state,
+                    SmartLocationActivationUtil.resolveState(
+                            window(TODAY.plusDays(1), TODAY.minusDays(1), state), TODAY),
+                    "inverted " + state);
+        }
     }
 
     @Test
@@ -125,7 +234,7 @@ class SmartLocationActivationUtilTest {
     @Test
     void resolveState_shouldNeverTouchManualStates() {
         List<SmartLocationState> manualStates = List.of(SmartLocationState.PLAIN_OCPI, SmartLocationState.ENRICHED,
-                SmartLocationState.INVALID, SmartLocationState.ARCHIVED);
+                SmartLocationState.INVALID);
 
         for (SmartLocationState state : manualStates) {
             assertEquals(state, SmartLocationActivationUtil.resolveState(window(TODAY, TODAY, state), TODAY),
@@ -160,8 +269,13 @@ class SmartLocationActivationUtilTest {
 
         assertTrue(SmartLocationActivationUtil.applyActiveState(location, TODAY));
         assertTrue(SmartLocationActivationUtil.applyActiveState(location, TODAY.plusDays(1)));
-        assertEquals(SmartLocationState.VERIFIED, location.getSmartLocationState());
+        assertEquals(SmartLocationState.ARCHIVED, location.getSmartLocationState());
         assertFalse(SmartLocationActivationUtil.applyActiveState(location, TODAY.plusDays(1)));
+
+        // Clearing the mistaken last day brings it straight back.
+        location.setActiveLastDay(null);
+        assertTrue(SmartLocationActivationUtil.applyActiveState(location, TODAY.plusDays(1)));
+        assertEquals(SmartLocationState.ACTIVE, location.getSmartLocationState());
     }
 
     @Test
