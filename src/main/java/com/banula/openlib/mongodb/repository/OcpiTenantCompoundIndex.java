@@ -43,17 +43,48 @@ public interface OcpiTenantCompoundIndex<T> {
     @Query("{'id': ?0, 'tenant': ?1}")
     List<T> findAllByIdAndTenant(String id, String tenant);
 
+    /**
+     * Tenant-scoped counterpart of
+     * {@link OcpiCommonCompoundIndex#findByFlexibleId(String)}: resolve an entity
+     * from the composite mongo {@code _id}, a raw ObjectId, or the plain OCPI
+     * {@code id} field, trying each in turn within the given tenant.
+     * <p>
+     * The {@code id}-field fallback is what lets a caller holding only the bare
+     * OCPI id find the document, which the composite {@code _id} lookup cannot do.
+     *
+     * @param id     the identifier in any of the supported forms
+     * @param tenant the tenant the entity belongs to
+     * @return the first matching entity within the tenant, or empty when none
+     *         matches
+     */
     default Optional<T> findByFlexibleId(String id, String tenant) {
-        if (id != null && id.contains("*")) {
+        if (id == null) {
+            return Optional.empty();
+        }
+
+        if (id.contains("*")) {
             String[] parts = id.split("\\*");
             if (parts.length == 3) {
-                return findByCompoundIndex(tenant, parts[0], parts[1], parts[2]);
+                Optional<T> byCompoundIndex = findByCompoundIndex(tenant, parts[0], parts[1], parts[2]);
+                if (byCompoundIndex.isPresent()) {
+                    return byCompoundIndex;
+                }
             }
         }
-        Optional<T> result = findByMongoIdAndTenant(id, tenant);
-        if (result.isEmpty() && ObjectId.isValid(id)) {
-            return findByObjectIdAndTenant(new ObjectId(id), tenant);
+
+        Optional<T> byMongoId = findByMongoIdAndTenant(id, tenant);
+        if (byMongoId.isPresent()) {
+            return byMongoId;
         }
-        return result;
+
+        if (ObjectId.isValid(id)) {
+            Optional<T> byObjectId = findByObjectIdAndTenant(new ObjectId(id), tenant);
+            if (byObjectId.isPresent()) {
+                return byObjectId;
+            }
+        }
+
+        List<T> byBusinessId = findAllByIdAndTenant(id, tenant);
+        return byBusinessId.isEmpty() ? Optional.empty() : Optional.of(byBusinessId.get(0));
     }
 }
