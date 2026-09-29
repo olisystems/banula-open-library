@@ -36,6 +36,7 @@ build/
 .vscode/
 .idea/
 .devin/
+local
 
 ### Mac OS ###
 **/.DS_Store
