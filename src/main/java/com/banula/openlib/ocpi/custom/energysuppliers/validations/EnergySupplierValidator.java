@@ -20,8 +20,11 @@ public class EnergySupplierValidator {
 
     /** 13-digit BDEW code or 16-character EIC code. */
     public static final Pattern MARKET_PARTNER_ID = Pattern.compile("^(\\d{13}|[A-Z0-9-]{16})$");
-    /** 2-digit issuing office, object type letter, 12 code characters and a check character. */
-    public static final Pattern EIC = Pattern.compile("^\\d{2}[A-Z][A-Z0-9-]{12}[A-Z0-9]$");
+    /**
+     * 2-digit issuing office, ENTSO-E object type (X party, Y area, Z measurement point, W resource,
+     * T tie line, V location, A substation), 12 code characters and a check character.
+     */
+    public static final Pattern EIC = Pattern.compile("^\\d{2}[XYZWTVA][A-Z0-9-]{12}[A-Z0-9]$");
     public static final Pattern MALO_ID = Pattern.compile("^\\d{11}$");
     public static final Pattern MABIS_METERING_POINT = Pattern.compile("^[A-Z0-9]{33}$");
     public static final int MAX_TEXT_LENGTH = 64;

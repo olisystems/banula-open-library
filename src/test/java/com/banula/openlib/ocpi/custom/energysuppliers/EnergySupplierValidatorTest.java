@@ -133,6 +133,9 @@ class EnergySupplierValidatorTest {
         assertTrue(EnergySupplierValidator.isValidEic("10YDE-RWENET---I"));
         assertFalse(EnergySupplierValidator.isValidEic("11XDE-TSO---XYZ1"));
         assertFalse(EnergySupplierValidator.isValidEic("1XXDE-TSO---XYZB"));
+        assertFalse(EnergySupplierValidator.isValidEic("11QDE-TSO---XYZZ"));
+        assertTrue(validate(validSupplier().balancingGroupId("11QDE-TSO---XYZZ").build())
+                .containsKey("balancing_group_id"));
         assertTrue(validate(validSupplier().balancingGroupId("11XDE-TSO---XYZ1").build())
                 .containsKey("balancing_group_id"));
     }
