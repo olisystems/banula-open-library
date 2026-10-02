@@ -21,7 +21,7 @@ class EnergySupplierMapperTest {
                 .esMarketPartnerId("9900000000001")
                 .name("Stadtwerke Test")
                 .bkvMarketPartnerId("9900000000002")
-                .balancingGroupId("11XDE-TSO---XYZ1")
+                .balancingGroupId("11XDE-TSO---XYZB")
                 .status(EnergySupplierStatus.ACTIVE)
                 .perTso(new ArrayList<>(List.of(EnergySupplierTsoEntry.builder()
                         .tsoMarketPartnerId("9911835000001").maloId("51709804123")

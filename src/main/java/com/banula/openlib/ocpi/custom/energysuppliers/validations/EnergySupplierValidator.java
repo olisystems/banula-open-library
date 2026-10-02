@@ -20,10 +20,12 @@ public class EnergySupplierValidator {
 
     /** 13-digit BDEW code or 16-character EIC code. */
     public static final Pattern MARKET_PARTNER_ID = Pattern.compile("^(\\d{13}|[A-Z0-9-]{16})$");
-    public static final Pattern EIC = Pattern.compile("^[A-Z0-9-]{16}$");
-    public static final Pattern MALO_ID = Pattern.compile("^[A-Z0-9]{11}$");
+    /** 2-digit issuing office, object type letter, 12 code characters and a check character. */
+    public static final Pattern EIC = Pattern.compile("^\\d{2}[A-Z][A-Z0-9-]{12}[A-Z0-9]$");
+    public static final Pattern MALO_ID = Pattern.compile("^\\d{11}$");
     public static final Pattern MABIS_METERING_POINT = Pattern.compile("^[A-Z0-9]{33}$");
     public static final int MAX_TEXT_LENGTH = 64;
+    private static final String EIC_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-";
 
     private EnergySupplierValidator() {
     }
@@ -39,7 +41,7 @@ public class EnergySupplierValidator {
         List<EnergySupplierTsoEntry> perTso = request.getPerTso() == null ? List.of()
                 : request.getPerTso().stream()
                         .map(entry -> EnergySupplierTsoEntry.builder()
-                                .tsoMarketPartnerId(entry == null ? null : trim(entry.getTsoMarketPartnerId()))
+                                .tsoMarketPartnerId(entry == null ? null : upper(entry.getTsoMarketPartnerId()))
                                 .maloId(entry == null ? null : upper(entry.getMaloId()))
                                 .mabisMeteringPoint(entry == null ? null : upper(entry.getMabisMeteringPoint()))
                                 .ownerType(MaloOwnerType.ES)
@@ -84,8 +86,8 @@ public class EnergySupplierValidator {
                 || !MARKET_PARTNER_ID.matcher(energySupplier.getBkvMarketPartnerId()).matches()) {
             errors.put("bkv_market_partner_id", "BKV market partner ID must be 13 digits (BDEW) or 16 characters (EIC)");
         }
-        if (isBlank(energySupplier.getBalancingGroupId()) || !EIC.matcher(energySupplier.getBalancingGroupId()).matches()) {
-            errors.put("balancing_group_id", "Balancing group ID must be a 16-character EIC code");
+        if (!isValidEic(energySupplier.getBalancingGroupId())) {
+            errors.put("balancing_group_id", "Balancing group ID must be a valid 16-character EIC code");
         }
         if (energySupplier.getBkzeReference() != null && energySupplier.getBkzeReference().length() > MAX_TEXT_LENGTH) {
             errors.put("bkze_reference", "BKZE reference must be at most " + MAX_TEXT_LENGTH + " characters");
@@ -113,7 +115,7 @@ public class EnergySupplierValidator {
                 errors.put(prefix + "tso_market_partner_id", "Each TSO control area can only be used once");
             }
             if (isBlank(entry.getMaloId()) || !MALO_ID.matcher(entry.getMaloId()).matches()) {
-                errors.put(prefix + "malo_id", "MaLo ID must be exactly 11 characters (digits or capital letters)");
+                errors.put(prefix + "malo_id", "MaLo ID must be exactly 11 digits");
             }
             if (isBlank(entry.getMabisMeteringPoint())
                     || !MABIS_METERING_POINT.matcher(entry.getMabisMeteringPoint()).matches()) {
@@ -121,6 +123,21 @@ public class EnergySupplierValidator {
                         "Mabis metering point must be exactly 33 characters (digits or capital letters)");
             }
         }
+    }
+
+    /**
+     * Checks the EIC structure and its check character (ENTSO-E): the first 15 characters, weighted 16 down
+     * to 2, are summed and the check character is {@code 36 - ((sum - 1) mod 37)}; '-' is never valid.
+     */
+    public static boolean isValidEic(String value) {
+        if (value == null || !EIC.matcher(value).matches()) {
+            return false;
+        }
+        int sum = 0;
+        for (int i = 0; i < 15; i++) {
+            sum += EIC_ALPHABET.indexOf(value.charAt(i)) * (16 - i);
+        }
+        return EIC_ALPHABET.charAt(36 - ((sum - 1) % 37)) == value.charAt(15);
     }
 
     private static boolean isBlank(String value) {

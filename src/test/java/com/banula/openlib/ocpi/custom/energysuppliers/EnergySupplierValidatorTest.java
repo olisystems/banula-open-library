@@ -1,6 +1,7 @@
 package com.banula.openlib.ocpi.custom.energysuppliers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ class EnergySupplierValidatorTest {
                 .esMarketPartnerId(ES_ID)
                 .name("Stadtwerke Test")
                 .bkvMarketPartnerId("9900000000002")
-                .balancingGroupId("11XDE-TSO---XYZ1")
+                .balancingGroupId("11XDE-TSO---XYZB")
                 .bkzeReference("BKZE-1")
                 .perTso(new ArrayList<>(List.of(tsoEntry(TENNET, "51709804123"))));
     }
@@ -52,12 +53,13 @@ class EnergySupplierValidatorTest {
     void normalisesCaseWhitespaceAndOwnership() {
         EnergySupplier normalized = EnergySupplierValidator.normalize(validSupplier()
                 .name("  Stadtwerke Test ")
-                .balancingGroupId(" 11xde-tso---xyz1 ")
-                .perTso(new ArrayList<>(List.of(tsoEntry(TENNET, " 5170980412a ")))).build());
+                .balancingGroupId(" 11xde-tso---xyzb ")
+                .perTso(new ArrayList<>(List.of(tsoEntry(" 10yde-eon------1 ", " 51709804123 ")))).build());
 
         assertEquals("Stadtwerke Test", normalized.getName());
-        assertEquals("11XDE-TSO---XYZ1", normalized.getBalancingGroupId());
-        assertEquals("5170980412A", normalized.getPerTso().get(0).getMaloId());
+        assertEquals("11XDE-TSO---XYZB", normalized.getBalancingGroupId());
+        assertEquals("10YDE-EON------1", normalized.getPerTso().get(0).getTsoMarketPartnerId());
+        assertEquals("51709804123", normalized.getPerTso().get(0).getMaloId());
         assertEquals(MaloOwnerType.ES, normalized.getPerTso().get(0).getOwnerType());
     }
 
@@ -115,5 +117,23 @@ class EnergySupplierValidatorTest {
 
         assertTrue(errors.containsKey("per_tso[0].malo_id"));
         assertTrue(errors.containsKey("per_tso[0].mabis_metering_point"));
+    }
+
+    @Test
+    void rejectsAMaloWithLetters() {
+        Map<String, String> errors = validate(validSupplier().perTso(new ArrayList<>(List.of(
+                tsoEntry(TENNET, "5170980412A")))).build());
+
+        assertTrue(errors.containsKey("per_tso[0].malo_id"));
+    }
+
+    @Test
+    void checksTheEicCheckCharacter() {
+        assertTrue(EnergySupplierValidator.isValidEic("10YDE-EON------1"));
+        assertTrue(EnergySupplierValidator.isValidEic("10YDE-RWENET---I"));
+        assertFalse(EnergySupplierValidator.isValidEic("11XDE-TSO---XYZ1"));
+        assertFalse(EnergySupplierValidator.isValidEic("1XXDE-TSO---XYZB"));
+        assertTrue(validate(validSupplier().balancingGroupId("11XDE-TSO---XYZ1").build())
+                .containsKey("balancing_group_id"));
     }
 }
