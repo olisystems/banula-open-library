@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ public class Price {
      */
     @Digits(integer = Integer.MAX_VALUE, fraction = 4, message = "Invalid price format for exclVat.")
     @NotNull(message = "ExclVat cannot be null.")
+    @PositiveOrZero(message = "excl_vat must not be negative")
     @JsonProperty("excl_vat")
     private BigDecimal exclVat;
 
@@ -38,6 +40,7 @@ public class Price {
      * Price/Cost including VAT.
      */
     @Digits(integer = Integer.MAX_VALUE, fraction = 4, message = "Invalid price format for inclVat.")
+    @PositiveOrZero(message = "incl_vat must not be negative")
     @JsonProperty("incl_vat")
     private BigDecimal inclVat;
 
