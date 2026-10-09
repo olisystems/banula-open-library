@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,7 @@ public class PriceComponent {
      */
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     @NotNull
+    @PositiveOrZero(message = "price must not be negative")
     @JsonProperty("price")
     private BigDecimal price;
 
@@ -40,6 +42,7 @@ public class PriceComponent {
      * here.
      */
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
+    @PositiveOrZero(message = "vat must not be negative")
     @JsonProperty("vat")
     private BigDecimal vat;
 
@@ -53,6 +56,7 @@ public class PriceComponent {
      * If 6 minutes were used, 10 minutes (2 blocks of step_size) will be billed.
      */
     @NotNull
+    @PositiveOrZero(message = "step_size must not be negative")
     @JsonProperty("step_size")
     private Integer stepSize;
 
