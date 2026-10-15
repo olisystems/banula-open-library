@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -29,7 +29,6 @@ public class TariffRestrictions {
      * ([0-1][0-9]|2[0-3]):[0-5][0-9]
      */
     @JsonProperty("start_time")
-    @NotNull
     private String startTime;
 
     /**
@@ -41,7 +40,6 @@ public class TariffRestrictions {
      * stop at end of the day use: 00:00.
      */
     @JsonProperty("end_time")
-    @NotNull
     private String endTime;
 
     /**
@@ -51,7 +49,6 @@ public class TariffRestrictions {
      * Regex: ([12][0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])
      */
     @JsonProperty("start_date")
-    @NotNull
     private String startDate;
 
     /**
@@ -61,7 +58,6 @@ public class TariffRestrictions {
      * start_date.
      */
     @JsonProperty("end_date")
-    @NotNull
     private String endDate;
 
     /**
@@ -69,6 +65,7 @@ public class TariffRestrictions {
      * energy (inclusive) being used.
      */
     @JsonProperty("min_kwh")
+    @PositiveOrZero(message = "min_kwh must not be negative")
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     private Float minKwh;
 
@@ -77,6 +74,7 @@ public class TariffRestrictions {
      * energy (exclusive) being used.
      */
     @JsonProperty("max_kwh")
+    @PositiveOrZero(message = "max_kwh must not be negative")
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     private Float maxKwh;
 
@@ -94,6 +92,7 @@ public class TariffRestrictions {
      * drops below the defined value.
      */
     @JsonProperty("min_current")
+    @PositiveOrZero(message = "min_current must not be negative")
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     private Float minCurrent;
 
@@ -110,6 +109,7 @@ public class TariffRestrictions {
      * the charging current raises above the defined value
      */
     @JsonProperty("max_current")
+    @PositiveOrZero(message = "max_current must not be negative")
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     private Float maxCurrent;
 
@@ -126,6 +126,7 @@ public class TariffRestrictions {
      * charging power drops below the defined value.
      */
     @JsonProperty("min_power")
+    @PositiveOrZero(message = "min_power must not be negative")
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     private Float minPower;
 
@@ -142,6 +143,7 @@ public class TariffRestrictions {
      * above the defined value
      */
     @JsonProperty("max_power")
+    @PositiveOrZero(message = "max_power must not be negative")
     @Digits(integer = Integer.MAX_VALUE, fraction = 4)
     private Float maxPower;
 
@@ -153,6 +155,7 @@ public class TariffRestrictions {
      * this TariffElement is not yet active.
      */
     @JsonProperty("min_duration")
+    @PositiveOrZero(message = "min_duration must not be negative")
     private Integer minDuration;
 
     /**
@@ -163,6 +166,7 @@ public class TariffRestrictions {
      * this TariffElement is no longer active.
      */
     @JsonProperty("max_duration")
+    @PositiveOrZero(message = "max_duration must not be negative")
     private Integer maxDuration;
 
     /**

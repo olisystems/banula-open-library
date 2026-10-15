@@ -58,18 +58,13 @@ public class RemovePartyFromIdAspect {
                             if (evse.getUid() != null) {
                                 evse.setUid(removePrefix(evse.getUid(), prefix));
                             }
-                            if (evse.getEvseId() != null) {
-                                evse.setEvseId(removePrefix(evse.getEvseId(), prefix));
-                            }
+                            // evse_id is the eMI3 EVSE ID (CC*PID*E...); its prefix is part of the ID.
                         }
                     }
                 } else if (args[i] instanceof EVSE) {
                     EVSE evse = (EVSE) args[i];
                     if (evse.getUid() != null) {
                         evse.setUid(removePrefix(evse.getUid(), prefix));
-                    }
-                    if (evse.getEvseId() != null) {
-                        evse.setEvseId(removePrefix(evse.getEvseId(), prefix));
                     }
                 } else if (args[i] instanceof TariffDTO) {
                     TariffDTO tariff = (TariffDTO) args[i];
