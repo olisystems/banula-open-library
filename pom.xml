@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>energy.oli</groupId>
     <artifactId>banula-open-library</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <packaging>jar</packaging>
 
     <name>banula-open-library</name>
@@ -15,6 +15,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <!-- API bundled by the OpenTelemetry Java agent 2.31.1; overrides the parent's managed 1.19.0.
+             Consumers resolve their own Boot-managed version, which is fine as only the stable span API is used. -->
+        <opentelemetry.version>1.65.0</opentelemetry.version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -114,6 +117,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
@@ -122,6 +135,10 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>

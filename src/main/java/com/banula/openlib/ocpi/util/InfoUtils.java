@@ -47,7 +47,7 @@ public class InfoUtils {
                 if (!"content-length".equalsIgnoreCase(headerName)) {
                     for (String headerValue : headerValues) {
                         curlCommand.append(" -H '").append(headerName).append(": ")
-                                .append(escapeSingleQuotes(headerValue))
+                                .append(escapeSingleQuotes(maskIfSecret(headerName, headerValue)))
                                 .append("'");
                     }
                 }
@@ -62,6 +62,14 @@ public class InfoUtils {
         // Add URL
         curlCommand.append(" '").append(url).append("'");
         log.info("Executing request:\n{}", curlCommand.toString());
+    }
+
+    private static String maskIfSecret(String headerName, String headerValue) {
+        if (!HttpHeaders.AUTHORIZATION.equalsIgnoreCase(headerName) || headerValue == null) {
+            return headerValue;
+        }
+        int schemeEnd = headerValue.indexOf(' ');
+        return schemeEnd > 0 ? headerValue.substring(0, schemeEnd) + " ***" : "***";
     }
 
     private static String escapeSingleQuotes(String input) {
