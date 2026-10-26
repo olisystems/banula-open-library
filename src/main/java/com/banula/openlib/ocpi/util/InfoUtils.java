@@ -64,12 +64,18 @@ public class InfoUtils {
         log.info("Executing request:\n{}", curlCommand.toString());
     }
 
-    private static String maskIfSecret(String headerName, String headerValue) {
+    static String maskIfSecret(String headerName, String headerValue) {
         if (!HttpHeaders.AUTHORIZATION.equalsIgnoreCase(headerName) || headerValue == null) {
             return headerValue;
         }
-        int schemeEnd = headerValue.indexOf(' ');
-        return schemeEnd > 0 ? headerValue.substring(0, schemeEnd) + " ***" : "***";
+        String value = headerValue.trim();
+        int schemeEnd = value.indexOf(' ');
+        String scheme = schemeEnd > 0 ? value.substring(0, schemeEnd) : "";
+        String credential = schemeEnd > 0 ? value.substring(schemeEnd + 1).trim() : value;
+        // Keep the last four characters only where they are a small share of the
+        // credential, so logs can tell tokens apart without revealing them.
+        String masked = "****" + (credential.length() >= 16 ? credential.substring(credential.length() - 4) : "");
+        return scheme.isEmpty() ? masked : scheme + " " + masked;
     }
 
     private static String escapeSingleQuotes(String input) {

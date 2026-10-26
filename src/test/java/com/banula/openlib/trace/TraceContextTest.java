@@ -65,4 +65,21 @@ class TraceContextTest {
         assertNull(TraceContext.party("DE", null));
         assertNull(TraceContext.party(" ", "ABC"));
     }
+
+    @Test
+    void valueOrNewIdKeepsSafeIds() {
+        String uuid = "cb31aca6-9109-4d3b-9875-08aa9f6418f0";
+        assertEquals(uuid, TraceContext.valueOrNewId(uuid));
+        assertEquals("req_1.a", TraceContext.valueOrNewId("req_1.a"));
+    }
+
+    @Test
+    void valueOrNewIdReplacesMissingOversizedOrUnsafeIds() {
+        for (String bad : new String[] { null, "", "   ", "a".repeat(129), "id with space", "id\nforged", "<script>" }) {
+            String id = TraceContext.valueOrNewId(bad);
+            assertNotEquals(bad, id);
+            assertEquals(36, id.length());
+        }
+        assertEquals("a".repeat(128), TraceContext.valueOrNewId("a".repeat(128)));
+    }
 }

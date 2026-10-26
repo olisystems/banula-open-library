@@ -2,6 +2,7 @@ package com.banula.openlib.trace;
 
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.regex.Pattern;
 
 import org.slf4j.MDC;
 
@@ -41,8 +42,12 @@ public final class TraceContext {
         return UUID.randomUUID().toString();
     }
 
+    // Inbound IDs come from external parties and end up in every log line, span and
+    // downstream header, so anything outside a short, safe shape is replaced.
+    private static final Pattern SAFE_ID = Pattern.compile("[A-Za-z0-9._-]{1,128}");
+
     public static String valueOrNewId(String value) {
-        return isBlank(value) ? newId() : value;
+        return value != null && SAFE_ID.matcher(value).matches() ? value : newId();
     }
 
     /** "CC/PID", or null unless both parts are present. */
