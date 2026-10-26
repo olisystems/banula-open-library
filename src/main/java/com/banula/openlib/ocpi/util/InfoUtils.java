@@ -47,7 +47,7 @@ public class InfoUtils {
                 if (!"content-length".equalsIgnoreCase(headerName)) {
                     for (String headerValue : headerValues) {
                         curlCommand.append(" -H '").append(headerName).append(": ")
-                                .append(escapeSingleQuotes(headerValue))
+                                .append(escapeSingleQuotes(maskIfSecret(headerName, headerValue)))
                                 .append("'");
                     }
                 }
@@ -62,6 +62,20 @@ public class InfoUtils {
         // Add URL
         curlCommand.append(" '").append(url).append("'");
         log.info("Executing request:\n{}", curlCommand.toString());
+    }
+
+    static String maskIfSecret(String headerName, String headerValue) {
+        if (!HttpHeaders.AUTHORIZATION.equalsIgnoreCase(headerName) || headerValue == null) {
+            return headerValue;
+        }
+        String value = headerValue.trim();
+        int schemeEnd = value.indexOf(' ');
+        String scheme = schemeEnd > 0 ? value.substring(0, schemeEnd) : "";
+        String credential = schemeEnd > 0 ? value.substring(schemeEnd + 1).trim() : value;
+        // Keep the last four characters only where they are a small share of the
+        // credential, so logs can tell tokens apart without revealing them.
+        String masked = "****" + (credential.length() >= 16 ? credential.substring(credential.length() - 4) : "");
+        return scheme.isEmpty() ? masked : scheme + " " + masked;
     }
 
     private static String escapeSingleQuotes(String input) {

@@ -5,7 +5,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -38,6 +37,7 @@ import com.banula.openlib.ocpi.model.vo.BusinessDetails;
 import com.banula.openlib.ocpi.model.vo.CredentialsRole;
 import com.banula.openlib.ocpi.model.vo.Endpoint;
 import com.banula.openlib.ocpi.util.InfoUtils;
+import com.banula.openlib.trace.TraceContext;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -280,28 +280,8 @@ public class OcnClient {
     private <T, N> T _call(OcnEndpoints endpoint, N body, HashMap<String, String> params, HttpHeaders headers,
             ParameterizedTypeReference<T> responseTypeRef, HttpMethod httpMethod, List<String> pathVariables,
             HashMap<String, String> requestParameters) throws Exception {
-        addSignatureIfSupported(headers, body, params);
-        String requestBody = objectMapper.writeValueAsString(body);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .fromHttpUrl(configuration.getNodeUrl() + endpoint.toString());
-        addPathAndQueryParams(uriBuilder, pathVariables, requestParameters);
-        String finalUrl = uriBuilder.encode().toUriString();
-
-        // Log the curl command
-        logCurlCommand(finalUrl, httpMethod, headers, requestBody);
-
-        ResponseEntity<T> response = restTemplate.exchange(
-                finalUrl,
-                httpMethod,
-                entity,
-                responseTypeRef);
-
-        T responseBody = response.getBody();
-        if (responseBody instanceof OcpiResponse) {
-            ((OcpiResponse<?>) responseBody).setHeaders(response.getHeaders());
-        }
-        return responseBody;
+        return this._call(configuration.getNodeUrl() + endpoint.toString(), body, params, headers, responseTypeRef,
+                httpMethod, pathVariables, requestParameters);
     }
 
     public <T, N> OcpiResponse<T> executeOcpiOperation(String url, N body, String toPartyId, String toCountryCode,
@@ -350,27 +330,31 @@ public class OcnClient {
     private <T, N> T _call(String url, N body, HashMap<String, String> params, HttpHeaders headers,
             ParameterizedTypeReference<T> responseTypeRef, HttpMethod httpMethod, List<String> pathVariables,
             HashMap<String, String> requestParameters) throws Exception {
-        addSignatureIfSupported(headers, body, params);
-        String requestBody = objectMapper.writeValueAsString(body);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
-        addPathAndQueryParams(uriBuilder, pathVariables, requestParameters);
-        String finalUrl = uriBuilder.encode().toUriString();
+        try (TraceContext.Outgoing trace = TraceContext.outgoing()) {
+            // trace headers must be set before signing: the OCN signature covers x-correlation-id
+            trace.applyTo(headers::set);
+            addSignatureIfSupported(headers, body, params);
+            String requestBody = objectMapper.writeValueAsString(body);
+            HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
+            addPathAndQueryParams(uriBuilder, pathVariables, requestParameters);
+            String finalUrl = uriBuilder.encode().toUriString();
 
-        // Log the curl command
-        logCurlCommand(finalUrl, httpMethod, headers, requestBody);
+            trace.log(httpMethod, finalUrl);
+            logCurlCommand(finalUrl, httpMethod, headers, requestBody);
 
-        ResponseEntity<T> response = restTemplate.exchange(
-                finalUrl,
-                httpMethod,
-                entity,
-                responseTypeRef);
+            ResponseEntity<T> response = restTemplate.exchange(
+                    finalUrl,
+                    httpMethod,
+                    entity,
+                    responseTypeRef);
 
-        T responseBody = response.getBody();
-        if (responseBody instanceof OcpiResponse) {
-            ((OcpiResponse<?>) responseBody).setHeaders(response.getHeaders());
+            T responseBody = response.getBody();
+            if (responseBody instanceof OcpiResponse) {
+                ((OcpiResponse<?>) responseBody).setHeaders(response.getHeaders());
+            }
+            return responseBody;
         }
-        return responseBody;
     }
 
     private void addPathAndQueryParams(UriComponentsBuilder uriBuilder, List<String> pathVariables,
@@ -582,8 +566,6 @@ public class OcnClient {
         headers.add("Accept", "*/*");
         String base64TokenC = Base64.getEncoder().encodeToString(configuration.getTokenC().getBytes());
         headers.add("Authorization", String.format("Token %s", base64TokenC));
-        headers.set("X-Request-ID", UUID.randomUUID().toString());
-        headers.set("X-Correlation-ID", UUID.randomUUID().toString());
         headers.set("OCPI-from-country-code", configuration.getFromCountryCode());
         headers.set("OCPI-from-party-id", configuration.getFromPartyId());
         headers.set("OCPI-to-country-code", configuration.getToCountryCode());
@@ -597,8 +579,6 @@ public class OcnClient {
         headers.add("Accept", "*/*");
         String base64TokenA = Base64.getEncoder().encodeToString(configuration.getTokenA().getBytes());
         headers.add("Authorization", String.format("Token %s", base64TokenA));
-        headers.set("X-Request-ID", UUID.randomUUID().toString());
-        headers.set("X-Correlation-ID", UUID.randomUUID().toString());
         headers.set("OCPI-from-country-code", configuration.getFromCountryCode());
         headers.set("OCPI-from-party-id", configuration.getFromPartyId());
         headers.set("OCPI-to-country-code", configuration.getToCountryCode());

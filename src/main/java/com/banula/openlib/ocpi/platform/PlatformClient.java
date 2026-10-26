@@ -2,7 +2,6 @@ package com.banula.openlib.ocpi.platform;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,6 +21,7 @@ import com.banula.openlib.ocpi.model.enums.InterfaceRole;
 import com.banula.openlib.ocpi.model.enums.ModuleID;
 import com.banula.openlib.ocpi.model.enums.Role;
 import com.banula.openlib.ocpi.util.InfoUtils;
+import com.banula.openlib.trace.TraceContext;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -96,13 +96,13 @@ public class PlatformClient {
             java.util.Map<String, String> queryParams) {
         log.info("Sending outflow request to platform for country code: {} and party id: {}", toOcpiCountryCode,
                 toOcpiPartyId);
-        try {
-
+        try (TraceContext.Outgoing trace = TraceContext.outgoing()) {
             String[] from = parseTenantId(tenantId);
-            HttpHeaders headers = createHeaders(from[0], from[1], toOcpiCountryCode, toOcpiPartyId);
+            HttpHeaders headers = createHeaders(trace, from[0], from[1], toOcpiCountryCode, toOcpiPartyId);
             String platformEndpoint = getOutflowUrl(moduleID, interfaceRole);
             String finalUrl = buildUrl(platformEndpoint, pathVariables, queryParams);
             HttpEntity<N> entity = new HttpEntity<>(body, headers);
+            trace.log(method, finalUrl);
             if (platformConfiguration.isToLogCurlCommands()) {
                 String requestBody = body != null ? objectMapper.writeValueAsString(body) : null;
                 InfoUtils.logCurlCommand(finalUrl, method, headers, requestBody);
@@ -132,13 +132,12 @@ public class PlatformClient {
         return uriBuilder.encode().toUriString();
     }
 
-    private HttpHeaders createHeaders(String fromOcpiCountryCode, String fromOcpiPartyId, String toOcpiCountryCode,
-            String toOcpiPartyId) {
+    private HttpHeaders createHeaders(TraceContext.Outgoing trace, String fromOcpiCountryCode, String fromOcpiPartyId,
+            String toOcpiCountryCode, String toOcpiPartyId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Accept", "*/*");
-        headers.set("X-Request-ID", UUID.randomUUID().toString());
-        headers.set("X-Correlation-ID", UUID.randomUUID().toString());
+        trace.applyTo(headers::set);
         headers.set("OCPI-from-country-code", fromOcpiCountryCode);
         headers.set("OCPI-from-party-id", fromOcpiPartyId);
         headers.set("OCPI-to-country-code", toOcpiCountryCode);
