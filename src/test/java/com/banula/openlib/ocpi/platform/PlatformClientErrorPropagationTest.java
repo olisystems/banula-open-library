@@ -111,6 +111,17 @@ class PlatformClientErrorPropagationTest {
     }
 
     @Test
+    void non2xxWithSuccessStatus_isAServerError() {
+        respond(HttpStatus.INTERNAL_SERVER_ERROR, "{\"status_code\":1000,\"status_message\":\"Success\"}");
+
+        OcpiUpstreamException ex = assertThrows(OcpiUpstreamException.class, this::send);
+
+        assertEquals(3000, ex.getStatusCode());
+        assertEquals(500, ex.getHttpStatus());
+        assertTrue(ex.getErrorMessage().contains("HTTP 500"), ex.getErrorMessage());
+    }
+
+    @Test
     void serverErrorWithoutOcpiBody_isAServerError() {
         server.expect(requestTo(URL)).andRespond(withStatus(HttpStatus.BAD_GATEWAY).body("upstream connect error"));
 

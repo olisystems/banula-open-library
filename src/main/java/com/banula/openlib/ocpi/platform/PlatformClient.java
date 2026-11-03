@@ -161,16 +161,19 @@ public class PlatformClient {
     }
 
     /**
-     * A non-2xx response. Its body is kept when it is an OCPI envelope. Any other body
-     * is a 3000: without an envelope nothing points at the caller's data, and a bare
-     * 4xx from the platform usually means a wrong route or credentials.
+     * A non-2xx response. Its body is kept when it is an OCPI envelope with an error
+     * status. Any other body is a 3000: without an envelope nothing points at the
+     * caller's data, and a bare 4xx from the platform usually means a wrong route or
+     * credentials. A 1xxx on a non-2xx is not kept either, since the caller would read
+     * it as a success.
      */
     private static OcpiUpstreamException upstreamError(String target, RestClientResponseException ex) {
         int httpStatus = ex.getStatusCode().value();
         String body = ex.getResponseBodyAsString();
         try {
             JsonNode node = objectMapper.readTree(body);
-            if (node != null && node.path("status_code").canConvertToInt()) {
+            if (node != null && node.path("status_code").canConvertToInt()
+                    && !isOcpiSuccess(node.get("status_code").asInt())) {
                 return upstreamError(target, node.get("status_code").asInt(), node.path("status_message").asText(null),
                         httpStatus);
             }
