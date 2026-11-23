@@ -25,7 +25,9 @@ class EnergySupplierMapperTest {
                 .status(EnergySupplierStatus.ACTIVE)
                 .perTso(new ArrayList<>(List.of(EnergySupplierTsoEntry.builder()
                         .tsoMarketPartnerId("9911835000001").maloId("51709804123")
-                        .mabisMeteringPoint("DE0000000000000000000000000000001").ownerType(MaloOwnerType.ES).build())))
+                        .mabisMeteringPoint("DE0000000000000000000000000000001")
+                        .supplierMabisMeteringPoint("DE0000000000000000000000000000002")
+                        .ownerType(MaloOwnerType.ES).build())))
                 .createdAt(Instant.parse("2026-10-01T08:00:00Z"))
                 .build();
     }

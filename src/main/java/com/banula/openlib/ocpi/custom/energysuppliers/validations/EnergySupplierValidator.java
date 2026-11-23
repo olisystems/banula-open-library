@@ -47,6 +47,8 @@ public class EnergySupplierValidator {
                                 .tsoMarketPartnerId(entry == null ? null : upper(entry.getTsoMarketPartnerId()))
                                 .maloId(entry == null ? null : upper(entry.getMaloId()))
                                 .mabisMeteringPoint(entry == null ? null : upper(entry.getMabisMeteringPoint()))
+                                .supplierMabisMeteringPoint(entry == null ? null
+                                        : blankToNull(upper(entry.getSupplierMabisMeteringPoint())))
                                 .ownerType(MaloOwnerType.ES)
                                 .build())
                         .toList();
@@ -125,6 +127,16 @@ public class EnergySupplierValidator {
                 errors.put(prefix + "mabis_metering_point",
                         "Mabis metering point must be exactly 33 characters (digits or capital letters)");
             }
+            String supplierMabis = entry.getSupplierMabisMeteringPoint();
+            if (!isBlank(supplierMabis)) {
+                if (!MABIS_METERING_POINT.matcher(supplierMabis).matches()) {
+                    errors.put(prefix + "supplier_mabis_metering_point",
+                            "Supplier Mabis metering point must be exactly 33 characters (digits or capital letters)");
+                } else if (supplierMabis.equals(entry.getMabisMeteringPoint())) {
+                    errors.put(prefix + "supplier_mabis_metering_point",
+                            "Supplier Mabis metering point must differ from the balancing Mabis metering point");
+                }
+            }
         }
     }
 
@@ -149,6 +161,10 @@ public class EnergySupplierValidator {
 
     private static String trim(String value) {
         return value == null ? null : value.trim();
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isEmpty() ? null : value;
     }
 
     private static String upper(String value) {

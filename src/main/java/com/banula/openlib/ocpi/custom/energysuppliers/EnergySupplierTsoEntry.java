@@ -10,7 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * The MaLo and Mabis metering point an energy supplier uses inside one TSO control area.
+ * The MaLo and Mabis metering points an energy supplier uses inside one TSO control area: the balancing
+ * MaBiS-ZP ({@code mabis_metering_point}) and, optionally, the Supplier MaBiS-ZP under which the supplier
+ * receives its own monthly time series for the control area ({@code supplier_mabis_metering_point}).
  */
 @Data
 @Builder(toBuilder = true)
@@ -28,6 +30,9 @@ public class EnergySupplierTsoEntry {
 
     @JsonProperty("mabis_metering_point")
     private String mabisMeteringPoint;
+
+    @JsonProperty("supplier_mabis_metering_point")
+    private String supplierMabisMeteringPoint;
 
     @JsonProperty("owner_type")
     private MaloOwnerType ownerType;
