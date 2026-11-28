@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -110,6 +111,43 @@ class EnergySupplierValidatorTest {
     }
 
     @Test
+    void acceptsAnOptionalSupplierMabisMeteringPoint() {
+        EnergySupplierTsoEntry entry = tsoEntry(TENNET, "51709804123").toBuilder()
+                .supplierMabisMeteringPoint(" de0000000000000000000000000000002 ").build();
+        EnergySupplier normalized = EnergySupplierValidator.normalize(
+                validSupplier().perTso(new ArrayList<>(List.of(entry))).build());
+
+        assertEquals("DE0000000000000000000000000000002", normalized.getPerTso().get(0).getSupplierMabisMeteringPoint());
+        assertTrue(validate(validSupplier().perTso(new ArrayList<>(List.of(entry))).build()).isEmpty());
+    }
+
+    @Test
+    void treatsABlankSupplierMabisMeteringPointAsAbsent() {
+        EnergySupplierTsoEntry entry = tsoEntry(TENNET, "51709804123").toBuilder().supplierMabisMeteringPoint("  ").build();
+        EnergySupplier normalized = EnergySupplierValidator.normalize(
+                validSupplier().perTso(new ArrayList<>(List.of(entry))).build());
+
+        assertEquals(null, normalized.getPerTso().get(0).getSupplierMabisMeteringPoint());
+        assertTrue(validate(normalized).isEmpty());
+    }
+
+    @Test
+    void rejectsAMalformedSupplierMabisMeteringPoint() {
+        EnergySupplierTsoEntry entry = tsoEntry(TENNET, "51709804123").toBuilder().supplierMabisMeteringPoint("DE2").build();
+
+        assertTrue(validate(validSupplier().perTso(new ArrayList<>(List.of(entry))).build())
+                .containsKey("per_tso[0].supplier_mabis_metering_point"));
+    }
+
+    @Test
+    void rejectsASupplierMabisMeteringPointEqualToTheBalancingOne() {
+        EnergySupplierTsoEntry entry = tsoEntry(TENNET, "51709804123").toBuilder().supplierMabisMeteringPoint(MABIS).build();
+
+        assertTrue(validate(validSupplier().perTso(new ArrayList<>(List.of(entry))).build())
+                .containsKey("per_tso[0].supplier_mabis_metering_point"));
+    }
+
+    @Test
     void rejectsMalformedMaloAndMabisMeteringPoint() {
         Map<String, String> errors = validate(validSupplier().perTso(new ArrayList<>(List.of(
                 EnergySupplierTsoEntry.builder().tsoMarketPartnerId(AMPRION).maloId("123").mabisMeteringPoint("DE1")
@@ -138,5 +176,27 @@ class EnergySupplierValidatorTest {
                 .containsKey("balancing_group_id"));
         assertTrue(validate(validSupplier().balancingGroupId("11XDE-TSO---XYZ1").build())
                 .containsKey("balancing_group_id"));
+    }
+
+    @Test
+    void normalizeUpperCasesIdsIndependentlyOfTheDefaultLocale() {
+        Locale original = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            EnergySupplier normalized = EnergySupplierValidator.normalize(
+                    validSupplier().balancingGroupId("11x-oli-ev-bk-03").build());
+            assertEquals("11X-OLI-EV-BK-03", normalized.getBalancingGroupId());
+        } finally {
+            Locale.setDefault(original);
+        }
+    }
+
+    @Test
+    void normalizeTurnsABlankSupplierMabisIntoNull() {
+        EnergySupplier normalized = EnergySupplierValidator.normalize(validSupplier()
+                .perTso(new ArrayList<>(List.of(EnergySupplierTsoEntry.builder().tsoMarketPartnerId(TENNET)
+                        .maloId("51709804123").mabisMeteringPoint(MABIS).supplierMabisMeteringPoint("   ").build())))
+                .build());
+        assertEquals(null, normalized.getPerTso().get(0).getSupplierMabisMeteringPoint());
     }
 }
