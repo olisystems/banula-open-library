@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -164,10 +165,11 @@ public class EnergySupplierValidator {
     }
 
     private static String blankToNull(String value) {
-        return value == null || value.isEmpty() ? null : value;
+        return value == null || value.isBlank() ? null : value;
     }
 
     private static String upper(String value) {
-        return value == null ? null : value.trim().toUpperCase();
+        // locale-independent: under a Turkish default locale toUpperCase() turns "i" into a dotted capital I
+        return value == null ? null : value.trim().toUpperCase(Locale.ROOT);
     }
 }

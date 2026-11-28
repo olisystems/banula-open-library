@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -175,5 +176,27 @@ class EnergySupplierValidatorTest {
                 .containsKey("balancing_group_id"));
         assertTrue(validate(validSupplier().balancingGroupId("11XDE-TSO---XYZ1").build())
                 .containsKey("balancing_group_id"));
+    }
+
+    @Test
+    void normalizeUpperCasesIdsIndependentlyOfTheDefaultLocale() {
+        Locale original = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            EnergySupplier normalized = EnergySupplierValidator.normalize(
+                    validSupplier().balancingGroupId("11x-oli-ev-bk-03").build());
+            assertEquals("11X-OLI-EV-BK-03", normalized.getBalancingGroupId());
+        } finally {
+            Locale.setDefault(original);
+        }
+    }
+
+    @Test
+    void normalizeTurnsABlankSupplierMabisIntoNull() {
+        EnergySupplier normalized = EnergySupplierValidator.normalize(validSupplier()
+                .perTso(new ArrayList<>(List.of(EnergySupplierTsoEntry.builder().tsoMarketPartnerId(TENNET)
+                        .maloId("51709804123").mabisMeteringPoint(MABIS).supplierMabisMeteringPoint("   ").build())))
+                .build());
+        assertEquals(null, normalized.getPerTso().get(0).getSupplierMabisMeteringPoint());
     }
 }
